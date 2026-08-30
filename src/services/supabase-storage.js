@@ -6,10 +6,21 @@ function enabled() {
   return String(process.env.STORAGE_PROVIDER || 'local').toLowerCase() === 'supabase';
 }
 
+function supabaseUrl() {
+  const raw = String(process.env.SUPABASE_URL || '').trim().replace(/^['"]|['"]$/g, '');
+  if (!raw) throw new Error('SUPABASE_URL is required for Supabase storage');
+  const candidate = /^[a-z][a-z\d+\-.]*:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    return new URL(candidate).toString();
+  } catch {
+    throw new Error('SUPABASE_URL must be a valid URL');
+  }
+}
+
 function getClient() {
   if (!enabled()) throw new Error('Supabase storage is not enabled');
   if (!client) {
-    client = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+    client = createClient(supabaseUrl(), process.env.SUPABASE_SERVICE_ROLE_KEY, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
   }
@@ -32,7 +43,7 @@ function objectKeyFromPublicUrl(value) {
   if (!enabled()) return null;
   try {
     const url = new URL(value);
-    const base = new URL(process.env.SUPABASE_URL);
+    const base = new URL(supabaseUrl());
     if (url.origin !== base.origin) return null;
     const prefix = `/storage/v1/object/public/${encodeURIComponent(publicBucket())}/`;
     if (!url.pathname.startsWith(prefix)) return null;
