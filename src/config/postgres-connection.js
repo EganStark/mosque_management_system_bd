@@ -1,5 +1,15 @@
 function postgresConnection(connectionString = process.env.DATABASE_URL) {
-  if (!connectionString) return null;
+  if (!connectionString) {
+    if (!process.env.PGHOST || !process.env.PGUSER || !process.env.PGPASSWORD) return null;
+    return {
+      host: process.env.PGHOST,
+      port: Number(process.env.PGPORT || 5432),
+      user: process.env.PGUSER,
+      password: process.env.PGPASSWORD,
+      database: process.env.PGDATABASE || 'postgres',
+      ssl: { rejectUnauthorized: false },
+    };
+  }
 
   let normalizedConnectionString = connectionString;
   let url;

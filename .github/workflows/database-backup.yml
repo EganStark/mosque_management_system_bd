@@ -23,7 +23,11 @@ jobs:
       - name: Export database to private Supabase Storage
         run: npm run backup:database
         env:
-          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          PGHOST: aws-0-ap-southeast-1.pooler.supabase.com
+          PGPORT: "5432"
+          PGUSER: postgres.azdqiwvsxkgftslfvqrw
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          PGDATABASE: postgres
           STORAGE_PROVIDER: supabase
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

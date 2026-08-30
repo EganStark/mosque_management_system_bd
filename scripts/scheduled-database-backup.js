@@ -16,7 +16,13 @@ function requireUrl(name, protocols) {
 }
 
 function validateBackupEnvironment() {
-  requireUrl('DATABASE_URL', ['postgres:', 'postgresql:']);
+  if (process.env.DATABASE_URL) {
+    requireUrl('DATABASE_URL', ['postgres:', 'postgresql:']);
+  } else {
+    for (const name of ['PGHOST', 'PGUSER', 'PGPASSWORD', 'PGDATABASE']) {
+      if (!process.env[name]) throw new Error(`${name} database setting is missing`);
+    }
+  }
   requireUrl('SUPABASE_URL', ['https:']);
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY.length < 32) {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY secret is missing or incomplete');
