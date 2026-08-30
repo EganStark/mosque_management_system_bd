@@ -1,120 +1,152 @@
+<div align="center">
+
 # Mosque Management System
 
-A modern, bilingual mosque management platform combining a public-facing website with a comprehensive administration dashboard. It helps mosque teams manage community records, prayer schedules, donations, finance, programs, welfare, staff, assets, documents, governance, and day-to-day operations from one system.
+### A bilingual digital platform for modern mosque administration
 
-The application supports Bangla and English, responsive desktop/mobile layouts, light and dark themes, role-based access control, auditable financial workflows, and dashboard-controlled public content. The mosque name, identity, contact details, prayer schedule, and website content are configurable for each installation.
+Manage the public website, community, prayer schedule, donations, accounts, programs, welfare, staff, assets, documents, and daily operations from one secure workspace.
 
-## Project status
+[![Node.js](https://img.shields.io/badge/Node.js-20%20%7C%2022-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14%2B-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=111827)](https://react.dev/)
+[![Tests](https://img.shields.io/badge/Integration_Tests-64_Passing-16A34A?style=for-the-badge&logo=jest&logoColor=white)](#quality-and-testing)
+[![License](https://img.shields.io/badge/License-MIT-0F766E?style=for-the-badge)](LICENSE)
 
-This repository is an actively developed portfolio and demonstration project. Its current automated verification includes 64 backend integration tests, production environment validation, and a successful TanStack Start production build.
+**Bangla + English · Responsive UI · Light + Dark themes · Secure RBAC · Public website + Admin dashboard**
 
-Live demonstration links will be added after the portfolio deployment is complete.
+[Overview](#overview) · [Features](#platform-capabilities) · [Architecture](#architecture) · [Quick start](#quick-start) · [Security](#security) · [Deployment](#deployment)
 
-## Highlights
+</div>
 
-- Public mosque website with prayer and jamaat times, Sahri/Iftar information, prohibited prayer periods, events, programs, announcements, gallery, staff, FAQs, Janaza notices, contact forms, and donation submissions.
-- Bilingual Bangla/English experience across the public website and administration dashboard.
-- Responsive, theme-aware interface designed for desktop, tablet, and mobile use.
-- Role and permission management for administrators, collectors, viewers, and module-specific users.
-- Controlled website publishing with drafts, reviews, scheduling, expiry, archives, history, restoration, and readiness checks.
-- PostgreSQL-backed sessions, CSRF protection, rate limiting, secure password hashing, and production configuration checks.
-- Local storage for development and optional Supabase object storage for public media, private documents, and backups.
+---
 
-## Management modules
+## Overview
 
-### Community and membership
+Mosque Management System is a reusable, full-stack platform built for mosques and Islamic community organizations. It combines two connected experiences:
 
-- Member profiles, family information, photos, occupations, references, and address hierarchy
-- Membership cards, printable profiles, ledgers, search, filtering, and exports
-- Monthly contribution configuration and payment tracking
-- Deceased-person and Janaza records
-- Public contact and donation inboxes
+| Experience | Purpose |
+|---|---|
+| **Public mosque website** | Prayer information, announcements, events, programs, gallery, staff, Janaza notices, donations, and community contact |
+| **Management dashboard** | Members, finance, operations, approvals, publishing, reporting, governance, staff, inventory, documents, and security |
+
+The mosque name, branding, contact details, prayer schedule, donation accounts, and public content are installation-specific and editable from the dashboard. The repository therefore remains a generic **Mosque Management System**, while each organization can present its own identity.
+
+> **Portfolio status:** the application is ready for a demonstration deployment. Live links and production screenshots will be added after hosting is connected.
+
+## Platform capabilities
+
+### Public website
+
+- Accurate prayer start, jamaat, and waqt-end information
+- Sahri and Iftar cards with prohibited prayer periods
+- Date-wise event calendar with recurring events
+- Announcements, programs, classes, staff, gallery, FAQs, and Janaza notices
+- Public donation and contact submissions
+- Bangla/English language switching
+- Responsive light and dark themes
+- Dashboard-controlled drafts, reviews, scheduling, expiry, publishing, and archives
+
+### Community management
+
+- Detailed member and family profiles
+- Hierarchical addresses, occupations, references, photos, and membership status
+- Member cards, printable profiles, account ledgers, search, filtering, and export
+- Monthly contributions and payment history
+- Deceased-person and Janaza management
+- Public message and donation inboxes
 
 ### Finance and accountability
 
-- Collections, donations, receipt books, pledges, and monthly payments
-- Expenses, vouchers, approval controls, and budget enforcement
-- Bank accounts, mobile wallets, deposits, withdrawals, and transfers
-- Loans, disbursements, repayments, cancellations, and reversals
-- Treasury overview, accounting periods, reconciliation, and operational reports
-- Welfare, procurement, payroll, and maintenance payment approvals
+- Donations, collections, receipts, pledges, and monthly payments
+- Expenses, vouchers, budgets, and approval workflows
+- Cash, bank accounts, and mobile-wallet ledgers
+- Treasury transfers, reconciliation, and accounting-period controls
+- Loans, repayments, cancellations, and traceable reversals
+- Welfare, supplier, payroll, and maintenance disbursement approvals
+- Operational, community, finance, and accountability reports
 
-### Mosque operations
+### Operations and governance
 
-- Prayer timetable and detailed waqt configuration
-- Programs, classes, attendance, events, and recurring calendar entries
-- Facility bookings and schedules
-- Committees, staff operations, meetings, decisions, and action tracking
-- Tasks, checklists, templates, recurring tasks, notifications, and dashboard preferences
-- Assets, inventory, suppliers, purchase requests, orders, goods receipts, and stock movements
-- Documents, reference numbers, templates, archives, and protected attachments
-- Data-quality checks, backups, global search, and security audit views
+- Programs, classes, attendance, and facility bookings
+- Staff attendance, payroll, committees, meetings, minutes, and decisions
+- Tasks, checklists, reusable templates, recurrence, and notifications
+- Assets, maintenance requests, suppliers, procurement, and inventory
+- Documents, templates, reference numbers, protected attachments, and archives
+- Global search, data-quality checks, audit logs, backups, and security controls
+
+## Designed for real workflows
+
+| Capability | Implementation |
+|---|---|
+| **Bilingual interface** | Bangla and English across the public site and management dashboard |
+| **Responsive experience** | Mobile, tablet, and desktop layouts with accessible navigation |
+| **Role-based access** | Administrator, collector, viewer, module permissions, and a hardened demo role |
+| **Financial safeguards** | Approval separation, balance validation, closed-period guards, reversals, and audit history |
+| **Website governance** | Draft, review, publish, schedule, expire, archive, restore, and publication history |
+| **Portfolio demo safety** | Full-module read visibility with all state-changing requests blocked server-side |
+| **Storage flexibility** | Local development storage or Supabase public/private object storage |
+| **Release readiness** | Environment validation, health checks, migration checks, tests, and backup tooling |
 
 ## Technology stack
 
-| Area | Technologies |
+| Layer | Technologies |
 |---|---|
-| Backend | Node.js, Express, EJS, Knex |
-| Database | PostgreSQL |
-| Public website | React, TypeScript, TanStack Start, Vite |
-| Styling | Tailwind CSS, Bootstrap, custom responsive design |
+| Public frontend | React 19, TypeScript, TanStack Start, Vite, Tailwind CSS |
+| Admin application | Node.js, Express, EJS, Bootstrap, custom design system |
+| Data layer | PostgreSQL, Knex migrations and seeds |
 | Authentication | Express Session, PostgreSQL session store, bcrypt |
-| Security | CSRF protection, Helmet, rate limiting, RBAC |
-| File storage | Local filesystem or Supabase Storage |
+| Application security | CSRF protection, Helmet, rate limiting, RBAC, audit logging |
 | Testing | Jest, Supertest |
-| Optional hosting | Vercel, Render, Supabase, GitHub Actions |
+| Optional cloud services | Vercel, Render, Supabase, GitHub Actions |
 
 ## Architecture
 
-```text
-Public website (TanStack Start)
-            |
-            | JSON API
-            v
-Express administration and API
-       |                 |
-       v                 v
-PostgreSQL         Local/Supabase Storage
+```mermaid
+flowchart LR
+    Visitor[Public visitor] --> Web[React + TanStack public website]
+    Staff[Mosque staff] --> Admin[Express + EJS management dashboard]
+    Web --> API[Public JSON API]
+    API --> Server[Express application]
+    Admin --> Server
+    Server --> DB[(PostgreSQL)]
+    Server --> Storage[(Local or Supabase Storage)]
 ```
 
-The public website reads published content through the Express API. Administrative pages are server-rendered with EJS and protected by authentication, permissions, CSRF validation, and server-side sessions.
+The public website consumes published data through the Express API. Administrative pages are server-rendered and protected by authentication, CSRF validation, permissions, and PostgreSQL-backed sessions. Business rules live in service modules rather than templates or route handlers.
 
-## Requirements
+## Quick start
+
+### Requirements
 
 - Node.js 20 or 22
 - npm
 - PostgreSQL 14 or newer
 
-## Local installation
-
-### 1. Clone the repository
+### 1. Clone and install the backend
 
 ```bash
 git clone https://github.com/EganStark/mosque_management_system_bd.git
 cd mosque_management_system_bd
-```
-
-### 2. Configure the backend
-
-```bash
 npm install
 ```
 
-Create the environment file:
+### 2. Create the environment file
+
+Windows PowerShell:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-On macOS or Linux:
+macOS or Linux:
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and provide your PostgreSQL connection, strong application secrets, and initial administrator credentials. Never commit `.env`.
+Update `.env` with your PostgreSQL URL, independent random secrets, and private administrator credentials.
 
-### 3. Initialize PostgreSQL
+### 3. Prepare the database
 
 ```bash
 npm run db:setup
@@ -122,19 +154,17 @@ npm run migrate
 npm run seed
 ```
 
-The seed commands are safe to run more than once. The administrator uses the `ADMIN_USERNAME` and `ADMIN_PASSWORD` values from `.env`.
-
-### 4. Start the administration application
+### 4. Start the management dashboard
 
 ```bash
 npm run dev
 ```
 
-Open <http://localhost:3000>.
+Open **http://localhost:3000** and sign in using `ADMIN_USERNAME` and `ADMIN_PASSWORD` from `.env`.
 
 ### 5. Start the public website
 
-Open a second terminal:
+In a second terminal:
 
 ```bash
 cd landing-page
@@ -147,72 +177,76 @@ Create `landing-page/.env`:
 VITE_API_URL=http://localhost:3000/api
 ```
 
-Then start it:
+Then run:
 
 ```bash
 npm run dev
 ```
 
-Open the URL printed by Vite, normally <http://localhost:5173>.
+Open the URL printed by Vite, normally **http://localhost:5173**.
 
-## Important environment variables
+## Configuration
 
-| Variable | Description |
+The complete safe template is available in [.env.example](.env.example).
+
+| Variable | Purpose |
 |---|---|
-| `DATABASE_URL` | PostgreSQL connection used by the application |
-| `SESSION_SECRET` | Long random secret used to sign sessions |
-| `CSRF_SECRET` | Long random secret used for CSRF protection |
-| `SUBMISSION_HASH_SECRET` | Separate secret for public-submission fingerprints |
-| `ADMIN_NAME` | Initial administrator display name |
-| `ADMIN_USERNAME` | Initial administrator username |
-| `ADMIN_EMAIL` | Initial administrator email |
-| `ADMIN_PASSWORD` | Initial administrator password |
-| `DEMO_MODE` | Enables the hardened read-only portfolio account when set to `true` |
-| `DEMO_USERNAME` | Username that receives full-module read-only demo access |
-| `DEMO_PASSWORD` | Separate password for the public demo account |
-| `LANDING_PAGE_ORIGIN` | Allowed public website origin or comma-separated origins |
-| `LANDING_PAGE_URL` | Public website URL shown inside the dashboard |
+| `DATABASE_URL` | PostgreSQL application connection |
+| `SESSION_SECRET` | Independent session-signing secret |
+| `CSRF_SECRET` | Independent CSRF secret |
+| `SUBMISSION_HASH_SECRET` | Public-submission fingerprint secret |
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Private initial administrator credentials |
+| `LANDING_PAGE_ORIGIN` | Origin allowed to access the public API |
+| `LANDING_PAGE_URL` | Public website URL presented by the dashboard |
 | `STORAGE_PROVIDER` | `local` or `supabase` |
-| `SUPABASE_URL` | Server-side Supabase project URL when Supabase storage is enabled |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-only Supabase service-role secret |
+| `DEMO_MODE` | Enables the hardened public portfolio account |
+| `DEMO_USERNAME` / `DEMO_PASSWORD` | Separate public read-only demo credentials |
 
-See [.env.example](.env.example) for the complete configuration reference.
+Supabase variables are required only when `STORAGE_PROVIDER=supabase`. Service-role credentials must remain server-side and must never use a `VITE_` prefix.
 
-## Commands
+## Useful commands
 
-| Command | Purpose |
+| Command | Description |
 |---|---|
-| `npm run dev` | Run the backend with automatic restart |
-| `npm start` | Run the backend normally |
+| `npm run dev` | Start the backend with automatic restart |
+| `npm start` | Start the backend normally |
 | `npm run db:setup` | Create the configured local database |
-| `npm run migrate` | Apply pending database migrations |
+| `npm run migrate` | Apply pending migrations |
 | `npm run migrate:rollback` | Roll back the latest migration batch |
-| `npm run seed` | Seed initial and demonstration configuration |
-| `npm run test:db` | Create or verify the isolated test database |
-| `npm test` | Run backend integration tests |
-| `npm run release:check-env` | Validate production environment settings |
-| `npm run release:preflight` | Verify database, migrations, storage, and production readiness |
+| `npm run seed` | Apply idempotent initial data |
+| `npm test` | Run the backend integration suite |
+| `npm run release:check-env` | Validate production configuration |
+| `npm run release:preflight` | Check database, migrations, storage, and credentials |
 | `npm run backup:database` | Create a checksummed application-data backup |
 
-Landing-page commands are run from `landing-page/`:
+Public-website commands run from `landing-page/`:
 
-| Command | Purpose |
+| Command | Description |
 |---|---|
 | `npm run dev` | Start the public website locally |
 | `npm run lint` | Run ESLint |
-| `npm run build` | Create the production build |
-| `npm run preview` | Preview a completed build |
+| `npm run build` | Produce the Vercel-compatible build |
+| `npm run preview` | Preview the production build locally |
 
-## Testing
+## Quality and testing
 
-Tests always use an isolated database whose name ends in `_test`.
+Current verification status:
+
+- **64/64 backend integration tests passing**
+- **0 backend production dependency vulnerabilities**
+- **Landing-page production build passing**
+- Production environment and storage preflight validation
+- Isolated test database enforcement: test database names must end in `_test`
+
+Run backend verification:
 
 ```bash
 npm run test:db
 npm test
+npm audit --omit=dev
 ```
 
-To test the public website:
+Run public-website verification:
 
 ```bash
 cd landing-page
@@ -220,57 +254,69 @@ npm run lint
 npm run build
 ```
 
-## Security notes
+## Security
 
-- Never publish `.env`, database credentials, service-role keys, session secrets, or real administrator passwords.
-- Replace all example credentials before exposing the application to the internet.
-- Use fictional information in public portfolio deployments; do not upload real member, financial, identity, or welfare records.
-- Public demo credentials should belong to a restricted account, never the primary administrator.
-- Private documents are authenticated downloads and should use a private storage bucket in hosted environments.
-- Run the production environment check and preflight before every release.
+- Passwords are hashed with bcrypt and never stored as plain text.
+- Sessions are server-side and persisted in PostgreSQL.
+- State-changing requests require valid CSRF tokens.
+- Login and public submission endpoints are rate-limited.
+- Route permissions and role capabilities are enforced server-side.
+- Financial mutations retain approval, reversal, and audit history.
+- Private documents require authenticated downloads.
+- The public `demo` role is inert unless explicitly enabled and cannot mutate data.
+- Production startup rejects placeholder secrets and unsafe configuration.
 
-## Optional free demo deployment
+> Never publish `.env`, database credentials, service-role keys, private administrator credentials, or real mosque/member/financial data in a portfolio deployment.
 
-The repository includes configuration for a portfolio deployment using:
+## Deployment
 
-- Vercel for the public website
-- Render for the Express administration application
-- Supabase for a small demonstration PostgreSQL database and object storage
-- GitHub Actions for optional scheduled backups
+The included optional portfolio architecture uses:
 
-See [FREE_DEPLOYMENT.md](FREE_DEPLOYMENT.md) for the deployment walkthrough. Free services have availability, sleep, retention, and usage limitations and should not be treated as production infrastructure.
+| Service | Responsibility |
+|---|---|
+| Vercel | TanStack Start public website |
+| Render | Express management dashboard and API |
+| Supabase | Small demonstration PostgreSQL database and object storage |
+| GitHub Actions | Optional scheduled database backups |
 
-## Repository structure
+See [FREE_DEPLOYMENT.md](FREE_DEPLOYMENT.md) for the complete deployment guide. Free-tier services have sleep, usage, retention, and availability limitations and should not be treated as production infrastructure.
+
+## Project structure
 
 ```text
-landing-page/       React and TanStack Start public website
-migrations/         PostgreSQL schema migrations
-seeds/              Initial settings and reusable defaults
-scripts/            Database, release, and backup utilities
-src/
-  config/           Database and environment configuration
-  middleware/       Authentication, security, governance, and uploads
-  public/           Administration assets and local public uploads
-  routes/           Administration pages and public API routes
-  services/         Business logic and data access
-  views/            EJS administration templates
-storage/            Local private documents and recovery backups
-tests/              Jest and Supertest integration tests
+.
+├── landing-page/       # React + TanStack Start public website
+├── migrations/         # PostgreSQL schema and safeguards
+├── seeds/              # Initial configuration and optional demo user
+├── scripts/            # Setup, release, and backup utilities
+├── src/
+│   ├── config/         # Database and environment configuration
+│   ├── middleware/     # Authentication, security, governance, uploads
+│   ├── public/         # Dashboard CSS, JavaScript, and public uploads
+│   ├── routes/         # Dashboard pages and public API
+│   ├── services/       # Business logic and data access
+│   └── views/          # EJS dashboard templates
+├── storage/            # Local private documents and backups
+└── tests/              # Jest + Supertest integration suite
 ```
 
 ## Roadmap
 
 - Resettable fictional demonstration dataset
+- Production screenshots and live portfolio links
 - Installation-level branding wizard
-- Additional automated browser and accessibility tests
-- Expanded notification gateway integrations
+- Automated browser and accessibility testing
+- Additional notification gateway integrations
 - Containerized self-hosting option
-- Additional documentation and production screenshots
 
 ## License
 
-This project is available under the [MIT License](LICENSE).
+Distributed under the [MIT License](LICENSE).
 
 ---
 
-Built as a reusable mosque administration and community-service platform for Bangla- and English-speaking organizations.
+<div align="center">
+
+Built as a reusable digital foundation for mosque administration and community service.
+
+</div>
