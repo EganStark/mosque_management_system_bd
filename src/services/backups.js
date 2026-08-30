@@ -39,7 +39,7 @@ async function exportData(client = db) {
   for (const table of TABLES) {
     if (await client.schema.hasTable(table)) tables[table] = await client(table).select('*').orderBy('id');
   }
-  const payload = { format: FORMAT, version: VERSION, createdAt: new Date().toISOString(), database: 'Baitur Rahman Mosque Management', tables };
+  const payload = { format: FORMAT, version: VERSION, createdAt: new Date().toISOString(), database: 'Mosque Management System', tables };
   return { ...payload, checksum: digest(payload) };
 }
 

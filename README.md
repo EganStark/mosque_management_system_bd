@@ -18,7 +18,7 @@ One connected platform for a public mosque website, community records, prayer sc
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Express](https://img.shields.io/badge/Express-5-111827?style=flat-square&logo=express&logoColor=white)](https://expressjs.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Tests](https://img.shields.io/badge/Tests-64_Passing-16A34A?style=flat-square&logo=jest&logoColor=white)](#-quality-and-testing)
+[![Tests](https://img.shields.io/badge/Tests-66_Passing-16A34A?style=flat-square&logo=jest&logoColor=white)](#-quality-and-testing)
 [![License](https://img.shields.io/badge/License-MIT-F59E0B?style=flat-square)](LICENSE)
 
 **বাংলা + English · Responsive UI · Light + Dark themes · Secure RBAC · Public website + Admin dashboard**
@@ -45,7 +45,7 @@ Names, branding, contact details, prayer schedules, donation accounts, and publi
 | Experience | Link | Access |
 |---|---|---|
 | 🌐 Public website | [Launch the live mosque website](https://mosque-management-system-bd.vercel.app/) | Public |
-| 🕌 Management dashboard | [Open the administration demo](https://mosque-management-admin.onrender.com/) | Demo credentials supplied by the owner |
+| 🕌 Management dashboard | [Open the administration demo](https://mosque-management-admin.onrender.com/) | `demo` / `MosqueDemo2026!View` (read-only) |
 | 💚 Service health | [Check API and database readiness](https://mosque-management-admin.onrender.com/healthz) | Public JSON status |
 
 > The portfolio uses fictional data. The demo account is enforced as read-only on the server. Render's free service can sleep after inactivity, so its first request may take about a minute.
@@ -195,7 +195,7 @@ Supabase variables are required only for Supabase storage. Service-role credenti
 
 ## 🧪 Quality and testing
 
-- **64/64 backend integration tests passing**
+- **66/66 backend integration tests passing**
 - **0 backend production dependency vulnerabilities**
 - Landing-page production build passing
 - Production environment and storage preflight validation

@@ -10,7 +10,7 @@ exports.seed = async (knex) => {
       isha: '19:55',
       jummah: '13:15',
       hijri_date: '17 Dhul-Hijjah 1447',
-      venue_name: 'বায়তুর রহমান জামে মসজিদ',
+      venue_name: 'নূর কমিউনিটি মসজিদ',
       venue_address: 'ঢাকা, বাংলাদেশ',
       venue_phone: '+880 1234-567890',
     });

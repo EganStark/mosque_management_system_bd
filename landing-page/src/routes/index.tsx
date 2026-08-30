@@ -22,13 +22,13 @@ import { ThemeProvider } from "@/lib/theme";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "বায়তুর রহমান জামে মসজিদ — Baitur Rahman Jame Mosjid" },
+      { title: "নূর কমিউনিটি মসজিদ — Noor Community Mosque" },
       {
         name: "description",
         content:
-          "Prayer times, donations, events and community programs at Baitur Rahman Jame Mosjid. A sanctuary of peace and faith.",
+          "Prayer times, donations, events and community programs at Noor Community Mosque. A sanctuary of peace and faith.",
       },
-      { property: "og:title", content: "Baitur Rahman Jame Mosjid" },
+      { property: "og:title", content: "Noor Community Mosque" },
       {
         property: "og:description",
         content: "A Sanctuary of Peace & Faith — prayer times, donations, events and community.",

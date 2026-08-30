@@ -9,7 +9,7 @@ exports.up = async (knex) => {
     t.string('isha').notNullable().defaultTo('19:55');
     t.string('jummah').notNullable().defaultTo('13:15');
     t.string('hijri_date').notNullable().defaultTo('17 Dhul-Hijjah 1447');
-    t.string('venue_name').notNullable().defaultTo('বায়তুর রহমান জামে মসজিদ');
+    t.string('venue_name').notNullable().defaultTo('নূর কমিউনিটি মসজিদ');
     t.string('venue_address').notNullable().defaultTo('ঢাকা, বাংলাদেশ');
     t.string('venue_phone').notNullable().defaultTo('+880 1234-567890');
     t.timestamps(true, true);
