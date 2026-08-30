@@ -1,93 +1,111 @@
 <div align="center">
 
+<img src="docs/assets/mosque-management-logo.svg" width="116" alt="Mosque Management System logo" />
+
 # Mosque Management System
 
-### A bilingual digital platform for modern mosque administration
+### Modern, bilingual mosque administration—from prayer times to accountable finance
 
-Manage the public website, community, prayer schedule, donations, accounts, programs, welfare, staff, assets, documents, and daily operations from one secure workspace.
+One connected platform for a public mosque website, community records, prayer schedules, donations, accounts, programs, welfare, staff, assets, documents, and daily operations.
 
-[![Node.js](https://img.shields.io/badge/Node.js-20%20%7C%2022-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14%2B-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=111827)](https://react.dev/)
-[![Tests](https://img.shields.io/badge/Integration_Tests-64_Passing-16A34A?style=for-the-badge&logo=jest&logoColor=white)](#quality-and-testing)
-[![License](https://img.shields.io/badge/License-MIT-0F766E?style=for-the-badge)](LICENSE)
+[![Live Website](https://img.shields.io/badge/VIEW_LIVE_WEBSITE-059669?style=for-the-badge&logo=vercel&logoColor=white)](https://mosque-management-system-bd.vercel.app/)
+[![Admin Demo](https://img.shields.io/badge/OPEN_ADMIN_DEMO-0F766E?style=for-the-badge&logo=render&logoColor=white)](https://mosque-management-admin.onrender.com/)
+[![API Health](https://img.shields.io/badge/API-HEALTHY-22C55E?style=for-the-badge&logo=statuspage&logoColor=white)](https://mosque-management-admin.onrender.com/healthz)
 
-**Bangla + English · Responsive UI · Light + Dark themes · Secure RBAC · Public website + Admin dashboard**
+[![Node.js](https://img.shields.io/badge/Node.js-20%20%7C%2022-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14%2B-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=111827)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Express](https://img.shields.io/badge/Express-5-111827?style=flat-square&logo=express&logoColor=white)](https://expressjs.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Tests](https://img.shields.io/badge/Tests-64_Passing-16A34A?style=flat-square&logo=jest&logoColor=white)](#-quality-and-testing)
+[![License](https://img.shields.io/badge/License-MIT-F59E0B?style=flat-square)](LICENSE)
 
-[Overview](#overview) · [Features](#platform-capabilities) · [Architecture](#architecture) · [Quick start](#quick-start) · [Security](#security) · [Deployment](#deployment)
+**বাংলা + English · Responsive UI · Light + Dark themes · Secure RBAC · Public website + Admin dashboard**
+
+[Live demo](#-live-demonstration) · [Capabilities](#-platform-capabilities) · [Architecture](#-architecture) · [Quick start](#-quick-start) · [Security](#-security) · [Deployment](#-deployment)
 
 </div>
 
 ---
 
-## Overview
+## ✨ Overview
 
-Mosque Management System is a reusable, full-stack platform built for mosques and Islamic community organizations. It combines two connected experiences:
+Mosque Management System is a reusable full-stack platform for mosques and Islamic community organizations. It combines two connected experiences:
 
 | Experience | Purpose |
 |---|---|
 | **Public mosque website** | Prayer information, announcements, events, programs, gallery, staff, Janaza notices, donations, and community contact |
 | **Management dashboard** | Members, finance, operations, approvals, publishing, reporting, governance, staff, inventory, documents, and security |
 
-The mosque name, branding, contact details, prayer schedule, donation accounts, and public content are installation-specific and editable from the dashboard. The repository therefore remains a generic **Mosque Management System**, while each organization can present its own identity.
+Names, branding, contact details, prayer schedules, donation accounts, and published content are installation-specific and editable from the dashboard. The repository stays a generic **Mosque Management System**, while each mosque can present its own identity.
 
-> **Portfolio status:** the application is ready for a demonstration deployment. Live links and production screenshots will be added after hosting is connected.
+## 🚀 Live demonstration
 
-## Platform capabilities
+| Experience | Link | Access |
+|---|---|---|
+| 🌐 Public website | [Launch the live mosque website](https://mosque-management-system-bd.vercel.app/) | Public |
+| 🕌 Management dashboard | [Open the administration demo](https://mosque-management-admin.onrender.com/) | Demo credentials supplied by the owner |
+| 💚 Service health | [Check API and database readiness](https://mosque-management-admin.onrender.com/healthz) | Public JSON status |
+
+> The portfolio uses fictional data. The demo account is enforced as read-only on the server. Render's free service can sleep after inactivity, so its first request may take about a minute.
+
+## 🧩 Platform capabilities
 
 ### Public website
 
-- Accurate prayer start, jamaat, and waqt-end information
+- Prayer start, jamaat, and waqt-end information
 - Sahri and Iftar cards with prohibited prayer periods
-- Date-wise event calendar with recurring events
+- Date-wise calendar with recurring mosque events
 - Announcements, programs, classes, staff, gallery, FAQs, and Janaza notices
 - Public donation and contact submissions
-- Bangla/English language switching
-- Responsive light and dark themes
-- Dashboard-controlled drafts, reviews, scheduling, expiry, publishing, and archives
+- Bangla/English switching with responsive light and dark themes
+- Dashboard-controlled drafts, review, scheduling, expiry, publishing, and archives
 
-### Community management
+### Community and operations
 
-- Detailed member and family profiles
-- Hierarchical addresses, occupations, references, photos, and membership status
-- Member cards, printable profiles, account ledgers, search, filtering, and export
-- Monthly contributions and payment history
+- Detailed member, family, address, occupation, and membership records
+- Member cards, printable profiles, account ledgers, search, filters, and exports
 - Deceased-person and Janaza management
-- Public message and donation inboxes
+- Programs, attendance, classes, and facility bookings
+- Staff attendance, payroll, committees, meetings, decisions, and minutes
+- Tasks, checklists, templates, recurrence, notifications, assets, and maintenance
+- Suppliers, procurement, inventory, protected documents, and archives
 
 ### Finance and accountability
 
 - Donations, collections, receipts, pledges, and monthly payments
-- Expenses, vouchers, budgets, and approval workflows
-- Cash, bank accounts, and mobile-wallet ledgers
-- Treasury transfers, reconciliation, and accounting-period controls
-- Loans, repayments, cancellations, and traceable reversals
-- Welfare, supplier, payroll, and maintenance disbursement approvals
-- Operational, community, finance, and accountability reports
+- Expenses, vouchers, budgets, and multi-step approvals
+- Cash, bank, and mobile-wallet ledgers
+- Treasury transfers, reconciliation, and closed accounting periods
+- Loans, repayments, welfare, supplier, payroll, and maintenance disbursements
+- Traceable cancellations, reversals, audit logs, and accountability reporting
 
-### Operations and governance
-
-- Programs, classes, attendance, and facility bookings
-- Staff attendance, payroll, committees, meetings, minutes, and decisions
-- Tasks, checklists, reusable templates, recurrence, and notifications
-- Assets, maintenance requests, suppliers, procurement, and inventory
-- Documents, templates, reference numbers, protected attachments, and archives
-- Global search, data-quality checks, audit logs, backups, and security controls
-
-## Designed for real workflows
+## 🛡️ Designed for real workflows
 
 | Capability | Implementation |
 |---|---|
-| **Bilingual interface** | Bangla and English across the public site and management dashboard |
+| **Bilingual interface** | Bangla and English across the public site and dashboard |
 | **Responsive experience** | Mobile, tablet, and desktop layouts with accessible navigation |
-| **Role-based access** | Administrator, collector, viewer, module permissions, and a hardened demo role |
-| **Financial safeguards** | Approval separation, balance validation, closed-period guards, reversals, and audit history |
+| **Role-based access** | Administrator, collector, viewer, module permissions, and hardened demo role |
+| **Financial safeguards** | Approval separation, balance validation, period guards, reversals, and history |
 | **Website governance** | Draft, review, publish, schedule, expire, archive, restore, and publication history |
-| **Portfolio demo safety** | Full-module read visibility with all state-changing requests blocked server-side |
+| **Portfolio safety** | Full-module demo visibility with all mutations blocked server-side |
 | **Storage flexibility** | Local development storage or Supabase public/private object storage |
-| **Release readiness** | Environment validation, health checks, migration checks, tests, and backup tooling |
+| **Release readiness** | Environment validation, health checks, migrations, tests, and backup tooling |
 
-## Technology stack
+## 🎨 Technology stack
+
+<p>
+  <img alt="TanStack" src="https://img.shields.io/badge/TanStack_Start-FF4154?style=for-the-badge&logo=reactquery&logoColor=white" />
+  <img alt="Vite" src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
+  <img alt="Bootstrap" src="https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white" />
+  <img alt="Knex" src="https://img.shields.io/badge/Knex-D26B38?style=for-the-badge&logo=knexdotjs&logoColor=white" />
+  <img alt="Jest" src="https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white" />
+  <img alt="Supabase" src="https://img.shields.io/badge/Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white" />
+  <img alt="Vercel" src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" />
+  <img alt="Render" src="https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=111827" />
+</p>
 
 | Layer | Technologies |
 |---|---|
@@ -97,24 +115,24 @@ The mosque name, branding, contact details, prayer schedule, donation accounts, 
 | Authentication | Express Session, PostgreSQL session store, bcrypt |
 | Application security | CSRF protection, Helmet, rate limiting, RBAC, audit logging |
 | Testing | Jest, Supertest |
-| Optional cloud services | Vercel, Render, Supabase, GitHub Actions |
+| Cloud portfolio | Vercel, Render, Supabase, GitHub Actions |
 
-## Architecture
+## 🏗️ Architecture
 
 ```mermaid
 flowchart LR
-    Visitor[Public visitor] --> Web[React + TanStack public website]
-    Staff[Mosque staff] --> Admin[Express + EJS management dashboard]
-    Web --> API[Public JSON API]
-    API --> Server[Express application]
-    Admin --> Server
-    Server --> DB[(PostgreSQL)]
-    Server --> Storage[(Local or Supabase Storage)]
+    Visitor[Public visitor] --> Web[React + TanStack website]
+    Staff[Mosque staff] --> Admin[Express + EJS dashboard]
+    Web -->|Published JSON| API[Express API]
+    Admin --> Server[Application services]
+    API --> Server
+    Server -->|TLS| DB[(PostgreSQL)]
+    Server --> Storage[(Public + private storage)]
 ```
 
-The public website consumes published data through the Express API. Administrative pages are server-rendered and protected by authentication, CSRF validation, permissions, and PostgreSQL-backed sessions. Business rules live in service modules rather than templates or route handlers.
+Administrative pages are server-rendered and protected by authentication, CSRF validation, permissions, and PostgreSQL-backed sessions. Business rules live in service modules rather than templates or route handlers.
 
-## Quick start
+## ⚡ Quick start
 
 ### Requirements
 
@@ -122,49 +140,24 @@ The public website consumes published data through the Express API. Administrati
 - npm
 - PostgreSQL 14 or newer
 
-### 1. Clone and install the backend
-
 ```bash
 git clone https://github.com/EganStark/mosque_management_system_bd.git
 cd mosque_management_system_bd
 npm install
 ```
 
-### 2. Create the environment file
-
-Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-macOS or Linux:
-
-```bash
-cp .env.example .env
-```
-
-Update `.env` with your PostgreSQL URL, independent random secrets, and private administrator credentials.
-
-### 3. Prepare the database
+Create `.env` from [.env.example](.env.example), configure it, then run:
 
 ```bash
 npm run db:setup
 npm run migrate
 npm run seed
-```
-
-### 4. Start the management dashboard
-
-```bash
 npm run dev
 ```
 
-Open **http://localhost:3000** and sign in using `ADMIN_USERNAME` and `ADMIN_PASSWORD` from `.env`.
+Open `http://localhost:3000` and use the administrator credentials from `.env`.
 
-### 5. Start the public website
-
-In a second terminal:
+Launch the public website in a second terminal:
 
 ```bash
 cd landing-page
@@ -177,140 +170,106 @@ Create `landing-page/.env`:
 VITE_API_URL=http://localhost:3000/api
 ```
 
-Then run:
-
 ```bash
 npm run dev
 ```
 
-Open the URL printed by Vite, normally **http://localhost:5173**.
+Open the Vite URL, normally `http://localhost:5173`.
 
-## Configuration
-
-The complete safe template is available in [.env.example](.env.example).
+## ⚙️ Configuration
 
 | Variable | Purpose |
 |---|---|
-| `DATABASE_URL` | PostgreSQL application connection |
-| `SESSION_SECRET` | Independent session-signing secret |
-| `CSRF_SECRET` | Independent CSRF secret |
+| `DATABASE_URL` | PostgreSQL connection |
+| `SESSION_SECRET` / `CSRF_SECRET` | Independent application secrets |
 | `SUBMISSION_HASH_SECRET` | Public-submission fingerprint secret |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Private initial administrator credentials |
 | `LANDING_PAGE_ORIGIN` | Origin allowed to access the public API |
-| `LANDING_PAGE_URL` | Public website URL presented by the dashboard |
+| `LANDING_PAGE_URL` | Public website URL shown by the dashboard |
 | `STORAGE_PROVIDER` | `local` or `supabase` |
-| `DEMO_MODE` | Enables the hardened public portfolio account |
-| `DEMO_USERNAME` / `DEMO_PASSWORD` | Separate public read-only demo credentials |
-| `DEMO_DATA_ENABLED` | Seeds an idempotent, entirely fictional portfolio dataset |
+| `DEMO_MODE` | Enables the hardened portfolio account |
+| `DEMO_USERNAME` / `DEMO_PASSWORD` | Separate public read-only credentials |
+| `DEMO_DATA_ENABLED` | Seeds an idempotent fictional demonstration dataset |
 
-Supabase variables are required only when `STORAGE_PROVIDER=supabase`. Service-role credentials must remain server-side and must never use a `VITE_` prefix.
+Supabase variables are required only for Supabase storage. Service-role credentials must stay server-side and must never use a `VITE_` prefix.
 
-## Useful commands
-
-| Command | Description |
-|---|---|
-| `npm run dev` | Start the backend with automatic restart |
-| `npm start` | Start the backend normally |
-| `npm run db:setup` | Create the configured local database |
-| `npm run migrate` | Apply pending migrations |
-| `npm run migrate:rollback` | Roll back the latest migration batch |
-| `npm run seed` | Apply idempotent initial data |
-| `npm test` | Run the backend integration suite |
-| `npm run release:check-env` | Validate production configuration |
-| `npm run release:preflight` | Check database, migrations, storage, and credentials |
-| `npm run backup:database` | Create a checksummed application-data backup |
-
-Public-website commands run from `landing-page/`:
-
-| Command | Description |
-|---|---|
-| `npm run dev` | Start the public website locally |
-| `npm run lint` | Run ESLint |
-| `npm run build` | Produce the Vercel-compatible build |
-| `npm run preview` | Preview the production build locally |
-
-## Quality and testing
-
-Current verification status:
+## 🧪 Quality and testing
 
 - **64/64 backend integration tests passing**
 - **0 backend production dependency vulnerabilities**
-- **Landing-page production build passing**
+- Landing-page production build passing
 - Production environment and storage preflight validation
-- Isolated test database enforcement: test database names must end in `_test`
-
-Run backend verification:
+- Isolated test database enforcement
 
 ```bash
 npm run test:db
 npm test
 npm audit --omit=dev
-```
-
-Run public-website verification:
-
-```bash
 cd landing-page
 npm run lint
 npm run build
 ```
 
-## Security
+## 🔐 Security
 
-- Passwords are hashed with bcrypt and never stored as plain text.
-- Sessions are server-side and persisted in PostgreSQL.
-- State-changing requests require valid CSRF tokens.
-- Login and public submission endpoints are rate-limited.
-- Route permissions and role capabilities are enforced server-side.
-- Financial mutations retain approval, reversal, and audit history.
-- Private documents require authenticated downloads.
-- The public `demo` role is inert unless explicitly enabled and cannot mutate data.
-- Production startup rejects placeholder secrets and unsafe configuration.
+- bcrypt password hashing and server-side PostgreSQL sessions
+- CSRF validation, Helmet headers, rate limits, and secure cookies
+- Server-enforced route permissions and role capabilities
+- Approval, reversal, and audit history for financial mutations
+- Authenticated access to private documents
+- Inert read-only public demo role when enabled
+- Production rejection of placeholder secrets and unsafe configuration
 
-> Never publish `.env`, database credentials, service-role keys, private administrator credentials, or real mosque/member/financial data in a portfolio deployment.
+> Never publish `.env`, database credentials, secret keys, administrator credentials, or real mosque/member/financial data.
 
-## Deployment
+## ☁️ Deployment
 
-The included optional portfolio architecture uses:
+```mermaid
+flowchart LR
+    Browser[Visitor browser] -->|HTTPS| Vercel[Vercel · Public website]
+    Browser -->|HTTPS| Render[Render · Dashboard + API]
+    Vercel -->|Published API| Render
+    Render -->|TLS| Postgres[(Supabase PostgreSQL)]
+    Render -->|Objects| Buckets[(Supabase Storage)]
+```
 
-| Service | Responsibility |
+| Component | Live URL |
 |---|---|
-| Vercel | TanStack Start public website |
-| Render | Express management dashboard and API |
-| Supabase | Small demonstration PostgreSQL database and object storage |
-| GitHub Actions | Optional scheduled database backups |
+| Public website | https://mosque-management-system-bd.vercel.app/ |
+| Admin dashboard and API | https://mosque-management-admin.onrender.com/ |
+| Readiness endpoint | https://mosque-management-admin.onrender.com/healthz |
 
-See [FREE_DEPLOYMENT.md](FREE_DEPLOYMENT.md) for the complete deployment guide. Free-tier services have sleep, usage, retention, and availability limitations and should not be treated as production infrastructure.
+See [FREE_DEPLOYMENT.md](FREE_DEPLOYMENT.md) for the complete guide. Free tiers have sleep, usage, retention, and availability limitations and are not production infrastructure.
 
-## Project structure
+## 📁 Project structure
 
 ```text
 .
-├── landing-page/       # React + TanStack Start public website
-├── migrations/         # PostgreSQL schema and safeguards
-├── seeds/              # Initial configuration and optional demo user
-├── scripts/            # Setup, release, and backup utilities
+├── docs/assets/         # Repository branding assets
+├── landing-page/        # React + TanStack Start public website
+├── migrations/          # PostgreSQL schema and safeguards
+├── seeds/               # Initial configuration and fictional demo data
+├── scripts/             # Setup, release, and backup utilities
 ├── src/
-│   ├── config/         # Database and environment configuration
-│   ├── middleware/     # Authentication, security, governance, uploads
-│   ├── public/         # Dashboard CSS, JavaScript, and public uploads
-│   ├── routes/         # Dashboard pages and public API
-│   ├── services/       # Business logic and data access
-│   └── views/          # EJS dashboard templates
-├── storage/            # Local private documents and backups
-└── tests/              # Jest + Supertest integration suite
+│   ├── config/          # Database and environment configuration
+│   ├── middleware/      # Authentication, security, governance, uploads
+│   ├── public/          # Dashboard CSS, JavaScript, and uploads
+│   ├── routes/          # Dashboard pages and public API
+│   ├── services/        # Business logic and data access
+│   └── views/           # EJS dashboard templates
+├── storage/             # Local private documents and backups
+└── tests/               # Jest + Supertest integration suite
 ```
 
-## Roadmap
+## 🗺️ Roadmap
 
-- One-command fictional demonstration-data reset tooling
-- Production screenshots and live portfolio links
+- Curated production screenshots and a guided demo tour
 - Installation-level branding wizard
 - Automated browser and accessibility testing
 - Additional notification gateway integrations
 - Containerized self-hosting option
 
-## License
+## 📄 License
 
 Distributed under the [MIT License](LICENSE).
 
@@ -319,5 +278,7 @@ Distributed under the [MIT License](LICENSE).
 <div align="center">
 
 Built as a reusable digital foundation for mosque administration and community service.
+
+**[Explore the website](https://mosque-management-system-bd.vercel.app/) · [Open the dashboard](https://mosque-management-admin.onrender.com/) · [View the source](https://github.com/EganStark/mosque_management_system_bd)**
 
 </div>
