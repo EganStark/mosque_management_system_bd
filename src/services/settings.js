@@ -1,7 +1,7 @@
 const db = require('../config/db');
 
 const DEFAULTS = {
-  company_name: 'Noor Community Mosque',
+  company_name: 'Baitur Rahman Jame Moshjid',
   company_address: '',
   company_phone: '',
   company_email: '',

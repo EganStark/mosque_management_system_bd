@@ -43,7 +43,7 @@ async function locals(req, res, next) {
   try {
     res.locals.company = await getSettings();
   } catch (e) {
-    res.locals.company = { company_name: 'Noor Community Mosque' };
+    res.locals.company = { company_name: 'Baitur Rahman Jame Moshjid' };
   }
   res.locals.navNotifications = { items: [], unreadCount: 0, totalCount: 0 };
   res.locals.navCapabilities = {};

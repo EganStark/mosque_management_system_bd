@@ -224,7 +224,7 @@ router.get('/company-settings', async (req, res) => {
   try {
     const row = await db('company_settings').orderBy('id').first();
     res.json({
-      name: row?.company_name || 'Noor Community Mosque',
+      name: row?.company_name || 'Baitur Rahman Jame Moshjid',
       tagline: 'A Sanctuary of Peace & Faith',
       address: row?.company_address || 'Dhaka, Bangladesh',
       phone: row?.company_phone || '+880 1234-567890',

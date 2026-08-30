@@ -1,7 +1,7 @@
 exports.up = async (knex) => {
   await knex.schema.createTable('company_settings', (t) => {
     t.increments('id').primary();
-    t.string('company_name').notNullable().defaultTo('Noor Community Mosque');
+    t.string('company_name').notNullable().defaultTo('Baitur Rahman Jame Moshjid');
     t.text('company_address');
     t.string('company_phone');
     t.string('company_email');

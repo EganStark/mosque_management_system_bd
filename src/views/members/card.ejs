@@ -1,6 +1,6 @@
 <div class="no-print d-flex justify-content-between align-items-center mb-4"><a href="/members/<%= member.id %>" class="btn btn-outline-secondary">ফিরে যান</a><button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer me-1"></i> কার্ড প্রিন্ট</button></div>
 <div class="member-id-card mx-auto">
-  <div class="member-id-card__header"><span class="material-symbols-outlined">mosque</span><div><strong><%= company&&company.company_name?company.company_name:'Noor Community Mosque' %></strong><small>সদস্য পরিচয়পত্র</small></div></div>
+  <div class="member-id-card__header"><span class="material-symbols-outlined">mosque</span><div><strong><%= company&&company.company_name?company.company_name:'Baitur Rahman Jame Moshjid' %></strong><small>সদস্য পরিচয়পত্র</small></div></div>
   <div class="member-id-card__body"><% if(member.photo){ %><img src="<%= member.photo %>" alt="<%= member.name %>"/><% }else{ %><div class="member-id-card__avatar"><i class="bi bi-person"></i></div><% } %><div><h3><%= member.name %></h3><p>সদস্য আইডি: <strong><%= bn.toBnDigits(member.id_no) %></strong></p><p>মোবাইল: <%= bn.toBnDigits(member.phone||'—') %></p><p>ঠিকানা: <%= [member.address_text,member.area_name,member.village_name].filter(Boolean).join(', ')||'—' %></p></div></div>
   <div class="member-id-card__footer"><span><%= member.status==='active'?'সক্রিয় সদস্য':'নিষ্ক্রিয় সদস্য' %></span><span>অনুমোদিত স্বাক্ষর</span></div>
 </div>

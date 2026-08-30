@@ -15,7 +15,7 @@ export const dict: Dict = {
   "nav.events": { bn: "অনুষ্ঠান", en: "Events" },
 
   // Brand
-  "brand.name": { bn: "নূর কমিউনিটি মসজিদ", en: "Noor Community Mosque" },
+  "brand.name": { bn: "বায়তুর রহমান জামে মসজিদ", en: "Baitur Rahman Jame Moshjid" },
   "brand.tagline": { bn: "শান্তি ও বিশ্বাসের আশ্রয়", en: "A Sanctuary of Peace & Faith" },
 
   // Hero

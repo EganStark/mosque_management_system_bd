@@ -19,7 +19,6 @@ One connected platform for a public mosque website, community records, prayer sc
 [![Express](https://img.shields.io/badge/Express-5-111827?style=flat-square&logo=express&logoColor=white)](https://expressjs.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Tests](https://img.shields.io/badge/Tests-66_Passing-16A34A?style=flat-square&logo=jest&logoColor=white)](#-quality-and-testing)
-[![License](https://img.shields.io/badge/License-MIT-F59E0B?style=flat-square)](LICENSE)
 
 **বাংলা + English · Responsive UI · Light + Dark themes · Secure RBAC · Public website + Admin dashboard**
 
@@ -271,7 +270,7 @@ See [FREE_DEPLOYMENT.md](FREE_DEPLOYMENT.md) for the complete guide. Free tiers 
 
 ## 📄 License
 
-Distributed under the [MIT License](LICENSE).
+Copyright © 2026 EganStark. All rights reserved.
 
 ---
 

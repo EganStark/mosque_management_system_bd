@@ -25,7 +25,7 @@ exports.seed = async (knex) => {
   await knex.transaction(async (trx) => {
     const company = await trx('company_settings').orderBy('id').first();
     const companyValues = {
-      company_name: 'Noor Community Mosque',
+      company_name: 'Baitur Rahman Jame Moshjid',
       company_address: 'Community Avenue, Dhaka — fictional portfolio address',
       company_phone: '+880 0000-000000',
       company_email: 'demo@example.invalid',
@@ -35,7 +35,7 @@ exports.seed = async (knex) => {
     else await trx('company_settings').insert(companyValues);
 
     await trx('prayer_settings').update({
-      venue_name: 'নূর কমিউনিটি মসজিদ',
+      venue_name: 'বায়তুর রহমান জামে মসজিদ',
       updated_at: trx.fn.now(),
     });
 
