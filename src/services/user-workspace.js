@@ -1,0 +1,11 @@
+const db = require('../config/db'); const security = require('./security');
+const MODULES = [{test:/^\/members\//,permission:'members.manage'},{test:/^\/(collections|expenses|loans|pledges)\//,permission:'finance.manage'},{test:/^\/(documents|governance-meetings|tasks)\//,permission:'people.manage'},{test:/^\/(assets|maintenance)\//,permission:'assets.manage'}];
+function rule(href){return MODULES.find(item=>item.test.test(String(href||'')));} function clean(value,max=160){return String(value||'').trim().replace(/[<>]/g,'').slice(0,max);}
+async function permitted(role,href){const item=rule(href);return Boolean(item&&await security.allowed(role,item.permission));}
+async function pins(user){const rows=await db('user_pinned_items').where({user_id:user.id}).orderBy('updated_at','desc').limit(12);const checks=await Promise.all(rows.map(row=>permitted(user.role,row.href)));return rows.filter((_,i)=>checks[i]);}
+async function recent(userId){return db('user_search_history').where({user_id:userId}).orderBy('searched_at','desc').limit(6);}
+async function summary(user){const[pinned,searches]=await Promise.all([pins(user),recent(user.id)]);return{pins:pinned,recentSearches:searches};}
+async function pin(user,data){const href=clean(data.href,300);if(!await permitted(user.role,href))throw new Error('এই রেকর্ড পিন করার অনুমতি নেই।');const values={user_id:user.id,item_type:clean(data.item_type,50),title:clean(data.title,160),subtitle:clean(data.subtitle,240)||null,icon:clean(data.icon,50)||'bookmark',href,updated_at:db.fn.now()};await db('user_pinned_items').insert(values).onConflict(['user_id','href']).merge(values);}
+async function unpin(user,id){return db('user_pinned_items').where({id,user_id:user.id}).del();}
+async function recordSearch(userId,query,count){const value=clean(query,100);if(value.length<2)return;const values={user_id:userId,query:value,result_count:Number(count||0),searched_at:db.fn.now()};await db('user_search_history').insert(values).onConflict(['user_id','query']).merge(values);const stale=await db('user_search_history').where({user_id:userId}).orderBy('searched_at','desc').offset(20).select('id');if(stale.length)await db('user_search_history').whereIn('id',stale.map(x=>x.id)).del();}
+module.exports={pins,summary,pin,unpin,recordSearch};

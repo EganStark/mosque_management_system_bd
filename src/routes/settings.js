@@ -1,6 +1,6 @@
 const express = require('express');
 const { requireAuth, adminOnly } = require('../middleware/auth');
-const { upload } = require('../middleware/upload');
+const { upload, uploadedPublicUrl } = require('../middleware/upload');
 const settingsService = require('../services/settings');
 const { invalidateSettingsCache } = require('../middleware/locals');
 
@@ -21,7 +21,7 @@ router.post('/company', upload.single('logo'), async (req, res, next) => {
       company_phone: req.body.company_phone || null,
       company_email: req.body.company_email || null,
     };
-    if (req.file) data.logo = '/uploads/' + req.file.filename;
+    if (req.file) data.logo = uploadedPublicUrl(req.file);
     await settingsService.upsert(data);
     invalidateSettingsCache();
     req.flash('success', 'তথ্য সংরক্ষণ হয়েছে।');

@@ -1,0 +1,149 @@
+<%
+  const todayParts = new Intl.DateTimeFormat('en', {
+    timeZone: 'Asia/Dhaka',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(new Date());
+  const todayPart = (type) => todayParts.find((part) => part.type === type).value;
+  const today = `${todayPart('year')}-${todayPart('month')}-${todayPart('day')}`;
+  const dateValue = (value) => value instanceof Date
+    ? value.toISOString().slice(0, 10)
+    : String(value || '').slice(0, 10);
+  const isRecurring = (event) => ['weekly', 'monthly'].includes(event.recurrence_type);
+  const finalDate = (event) => {
+    if (!isRecurring(event)) return dateValue(event.event_date);
+    return event.recurrence_until ? dateValue(event.recurrence_until) : '9999-12-31';
+  };
+  const upcomingCount = rows.filter((event) => finalDate(event) >= today).length;
+  const recurringCount = rows.filter(isRecurring).length;
+  const publishedCount = rows.filter((event) => event.publication_status === 'published').length;
+%>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">ল্যান্ডিং পেজ অনুষ্ঠানসমূহ</h3>
+  <div>
+    <a href="/landing" class="btn btn-outline-secondary me-2"><i class="bi bi-arrow-left me-1"></i> ফিরে যান</a>
+    <a href="/landing/events/new" class="btn btn-primary"><i class="bi bi-calendar-plus me-1"></i> নতুন অনুষ্ঠান</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="card h-100 border-0 shadow-sm"><div class="card-body">
+    <small class="text-muted" data-bn="মোট অনুষ্ঠান" data-en="Total events">মোট অনুষ্ঠান</small>
+    <div class="fs-3 fw-bold mt-1"><%= bn.toBnDigits(rows.length) %></div>
+  </div></div></div>
+  <div class="col-6 col-lg-3"><div class="card h-100 border-0 shadow-sm"><div class="card-body">
+    <small class="text-muted" data-bn="আসন্ন ও চলমান" data-en="Upcoming & ongoing">আসন্ন ও চলমান</small>
+    <div class="fs-3 fw-bold text-primary mt-1"><%= bn.toBnDigits(upcomingCount) %></div>
+  </div></div></div>
+  <div class="col-6 col-lg-3"><div class="card h-100 border-0 shadow-sm"><div class="card-body">
+    <small class="text-muted" data-bn="পুনরাবৃত্ত অনুষ্ঠান" data-en="Recurring events">পুনরাবৃত্ত অনুষ্ঠান</small>
+    <div class="fs-3 fw-bold text-info mt-1"><%= bn.toBnDigits(recurringCount) %></div>
+  </div></div></div>
+  <div class="col-6 col-lg-3"><div class="card h-100 border-0 shadow-sm"><div class="card-body">
+    <small class="text-muted" data-bn="প্রকাশিত" data-en="Published">প্রকাশিত</small>
+    <div class="fs-3 fw-bold text-success mt-1"><%= bn.toBnDigits(publishedCount) %></div>
+  </div></div></div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <form method="get" action="/landing/events" class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label" data-bn="সময়সীমা" data-en="Lifecycle">সময়সীমা</label>
+        <select class="form-select" name="lifecycle">
+          <option value="" data-bn="সব অনুষ্ঠান" data-en="All events">সব অনুষ্ঠান</option>
+          <option value="upcoming" <%= filters.lifecycle === 'upcoming' ? 'selected' : '' %> data-bn="আসন্ন ও চলমান" data-en="Upcoming & ongoing">আসন্ন ও চলমান</option>
+          <option value="past" <%= filters.lifecycle === 'past' ? 'selected' : '' %> data-bn="শেষ হয়েছে" data-en="Finished">শেষ হয়েছে</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" data-bn="পুনরাবৃত্তি" data-en="Recurrence">পুনরাবৃত্তি</label>
+        <select class="form-select" name="recurrence">
+          <option value="" data-bn="সব ধরন" data-en="All types">সব ধরন</option>
+          <option value="none" <%= filters.recurrence === 'none' ? 'selected' : '' %> data-bn="একবার" data-en="One time">একবার</option>
+          <option value="weekly" <%= filters.recurrence === 'weekly' ? 'selected' : '' %> data-bn="সাপ্তাহিক" data-en="Weekly">সাপ্তাহিক</option>
+          <option value="monthly" <%= filters.recurrence === 'monthly' ? 'selected' : '' %> data-bn="মাসিক" data-en="Monthly">মাসিক</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" data-bn="প্রকাশনার অবস্থা" data-en="Publication status">প্রকাশনার অবস্থা</label>
+        <select class="form-select" name="status">
+          <option value="" data-bn="সব অবস্থা" data-en="All statuses">সব অবস্থা</option>
+          <option value="published" <%= filters.status === 'published' ? 'selected' : '' %> data-bn="প্রকাশিত" data-en="Published">প্রকাশিত</option>
+          <option value="draft" <%= filters.status === 'draft' ? 'selected' : '' %> data-bn="খসড়া" data-en="Draft">খসড়া</option>
+          <option value="inactive" <%= filters.status === 'inactive' ? 'selected' : '' %> data-bn="নিষ্ক্রিয়" data-en="Inactive">নিষ্ক্রিয়</option>
+        </select>
+      </div>
+      <div class="col-md-3 d-flex gap-2">
+        <button class="btn btn-primary flex-grow-1" type="submit"><i class="bi bi-funnel me-1"></i><span data-bn="ফিল্টার করুন" data-en="Apply filters">ফিল্টার করুন</span></button>
+        <% if (filters.lifecycle || filters.recurrence || filters.status) { %>
+          <a class="btn btn-outline-secondary" href="/landing/events" title="Reset filters"><i class="bi bi-x-lg"></i></a>
+        <% } %>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card shadow-sm"><div class="card-body">
+  <div class="table-responsive">
+    <table class="table table-striped table-hover datatable w-100">
+      <thead>
+        <tr>
+          <th>ক্রমিক</th>
+          <th>শিরোনাম (বাংলা)</th>
+          <th>শিরোনাম (ইংরেজি)</th>
+          <th>তারিখ</th>
+          <th>সময়</th>
+          <th>বিভাগ</th>
+          <th>অবস্থান</th>
+          <th>স্ট্যাটাস</th>
+          <th data-bn="পুনরাবৃত্তি" data-en="Recurrence">পুনরাবৃত্তি</th>
+          <th class="no-print">অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.forEach(function(ev, i) { %>
+        <tr>
+          <td><%= bn.toBnDigits(i + 1) %></td>
+          <td><strong><%= ev.title_bn %></strong></td>
+          <td><%= ev.title_en %></td>
+          <td><%= bn.toBnDigits(ev.event_date.toISOString().slice(0, 10)) %></td>
+          <td><%= bn.toBnDigits(String(ev.event_time).slice(0, 5)) %><% if (ev.end_time) { %>–<%= bn.toBnDigits(String(ev.end_time).slice(0, 5)) %><% } %></td>
+          <td><%= ev.category %></td>
+          <td><%= ev.location %></td>
+          <td>
+            <% if (ev.is_active) { %>
+            <span class="badge bg-success">সক্রিয়</span>
+            <% } else { %>
+            <span class="badge bg-secondary">নিষ্ক্রিয়</span>
+            <% } %>
+          </td>
+          <td>
+            <% if (ev.recurrence_type === 'weekly') { %>
+              <span class="badge bg-info-subtle text-info-emphasis" data-bn="সাপ্তাহিক" data-en="Weekly">সাপ্তাহিক</span>
+            <% } else if (ev.recurrence_type === 'monthly') { %>
+              <span class="badge bg-primary-subtle text-primary-emphasis" data-bn="মাসিক" data-en="Monthly">মাসিক</span>
+            <% } else { %>
+              <span class="badge bg-secondary-subtle text-secondary-emphasis" data-bn="একবার" data-en="One time">একবার</span>
+            <% } %>
+            <% if (ev.recurrence_until) { %>
+              <small class="d-block text-muted mt-1"><span data-bn="শেষ:" data-en="Until:">শেষ:</span> <%= bn.toBnDigits(dateValue(ev.recurrence_until)) %></small>
+            <% } %>
+            <% if (finalDate(ev) < today) { %>
+              <span class="badge bg-light text-dark border mt-1" data-bn="শেষ হয়েছে" data-en="Ended">শেষ হয়েছে</span>
+            <% } %>
+          </td>
+          <td class="no-print">
+            <a href="/landing/events/<%= ev.id %>/edit" class="btn btn-sm btn-outline-primary" title="সম্পাদনা"><i class="bi bi-pencil"></i></a>
+            <form method="post" action="/landing/events/<%= ev.id %>/delete" class="d-inline confirm-delete">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button class="btn btn-sm btn-outline-danger" title="মুছুন"><i class="bi bi-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div></div>

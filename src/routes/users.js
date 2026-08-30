@@ -65,28 +65,49 @@ router.post('/:id', async (req, res, next) => {
     await usersService.update(req.params.id, {
       name, username, email,
       role: usersService.ROLES.includes(role) ? role : 'viewer',
-      is_active: req.body.is_active === 'on' || req.body.is_active === 'true',
       password: password && password.trim() ? password : undefined,
-    });
+    }, req.session.user.id);
     req.flash('success', 'তথ্য হালনাগাদ হয়েছে।');
     res.redirect('/users');
   } catch (err) {
+    if (err.message === 'You cannot remove your own administrator role'
+      || err.message === 'At least one active administrator is required') {
+      req.flash('error', err.message === 'You cannot remove your own administrator role'
+        ? 'আপনি নিজের অ্যাডমিন ভূমিকা সরাতে পারবেন না।'
+        : 'অন্তত একজন সক্রিয় অ্যাডমিন থাকতে হবে।');
+      return res.redirect(`/users/${req.params.id}/edit`);
+    }
     next(err);
   }
 });
 
-router.post('/:id/delete', async (req, res, next) => {
+router.post(
+  '/:id/status',
+  body('is_active').isIn(['true', 'false']),
+  async (req, res, next) => {
   try {
-    if (Number(req.params.id) === req.session.user.id) {
-      req.flash('error', 'আপনি নিজের অ্যাকাউন্ট মুছতে পারবেন না।');
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      req.flash('error', 'অবৈধ অ্যাকাউন্ট অবস্থা।');
       return res.redirect('/users');
     }
-    await usersService.remove(req.params.id);
-    req.flash('success', 'ব্যবহারকারী মুছে ফেলা হয়েছে।');
+    const isActive = req.body.is_active === 'true';
+    await usersService.setActive(req.params.id, isActive, req.session.user.id);
+    req.flash('success', isActive
+      ? 'ব্যবহারকারী অ্যাকাউন্ট পুনরায় সক্রিয় হয়েছে।'
+      : 'ব্যবহারকারী অ্যাকাউন্ট নিষ্ক্রিয় হয়েছে। পূর্বের সকল রেকর্ড সংরক্ষিত আছে।');
     res.redirect('/users');
   } catch (err) {
+    if (err.message === 'You cannot deactivate your own account'
+      || err.message === 'At least one active administrator is required') {
+      req.flash('error', err.message === 'You cannot deactivate your own account'
+        ? 'আপনি নিজের অ্যাকাউন্ট নিষ্ক্রিয় করতে পারবেন না।'
+        : 'অন্তত একজন সক্রিয় অ্যাডমিন থাকতে হবে।');
+      return res.redirect('/users');
+    }
     next(err);
   }
-});
+  }
+);
 
 module.exports = router;

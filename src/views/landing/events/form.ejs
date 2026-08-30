@@ -1,0 +1,130 @@
+<%
+  const isEdit = event !== null;
+  const action = isEdit ? `/landing/events/${event.id}/edit` : '/landing/events/new';
+%>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><%= title %></h3>
+  <a href="/landing/events" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> ফিরে যান</a>
+</div>
+
+<div class="card shadow-sm"><div class="card-body">
+  <form method="post" action="<%= action %>?_csrf=<%= encodeURIComponent(csrfToken) %>" class="row g-3">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+    <div class="col-md-6">
+      <label class="form-label required">অনুষ্ঠানের নাম (বাংলা)</label>
+      <input type="text" name="title_bn" class="form-control" value="<%= isEdit ? event.title_bn : '' %>" required />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label required">অনুষ্ঠানের নাম (ইংরেজি)</label>
+      <input type="text" name="title_en" class="form-control" value="<%= isEdit ? event.title_en : '' %>" required />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">বিবরণ (বাংলা)</label>
+      <textarea name="description_bn" class="form-control" rows="3"><%= isEdit ? event.description_bn : '' %></textarea>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">বিবরণ (ইংরেজি)</label>
+      <textarea name="description_en" class="form-control" rows="3"><%= isEdit ? event.description_en : '' %></textarea>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <label class="form-label required">বিভাগ (Category)</label>
+      <select name="category" class="form-select">
+        <option value="Regular" <%= isEdit && event.category === 'Regular' ? 'selected' : '' %>>নিয়মিত (Regular)</option>
+        <option value="Education" <%= isEdit && event.category === 'Education' ? 'selected' : '' %>>শিক্ষা (Education)</option>
+        <option value="Community" <%= isEdit && event.category === 'Community' ? 'selected' : '' %>>সম্প্রদায় (Community)</option>
+        <option value="Meeting" <%= isEdit && event.category === 'Meeting' ? 'selected' : '' %>>সভা (Meeting)</option>
+      </select>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <label class="form-label required">অনুষ্ঠানের তারিখ</label>
+      <input type="date" name="event_date" class="form-control" value="<%= isEdit ? event.event_date.toISOString().slice(0, 10) : '' %>" required data-event-date />
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <label class="form-label required">সময় (যেমন: 10:00 বা বাদ আসর)</label>
+      <input type="time" name="event_time" class="form-control" value="<%= isEdit ? String(event.event_time).slice(0, 5) : '' %>" required data-event-start-time />
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <label class="form-label" data-bn="শেষের সময়" data-en="End time">শেষের সময়</label>
+      <input type="time" name="end_time" class="form-control" value="<%= isEdit && event.end_time ? String(event.end_time).slice(0, 5) : '' %>" data-event-end-time />
+      <small class="text-muted" data-bn="শেষের সময় অবশ্যই শুরুর সময়ের পরে হবে।" data-en="End time must be later than start time.">শেষের সময় অবশ্যই শুরুর সময়ের পরে হবে।</small>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <label class="form-label required">স্থান (Location)</label>
+      <input type="text" name="location" class="form-control" value="<%= isEdit ? event.location : 'মসজিদ প্রাঙ্গণ' %>" required />
+    </div>
+
+    <div class="col-md-4 col-sm-6">
+      <label class="form-label" data-bn="পুনরাবৃত্তি" data-en="Repeat">পুনরাবৃত্তি</label>
+      <select name="recurrence_type" class="form-select" data-event-recurrence>
+        <option value="none" <%= !isEdit || !event.recurrence_type || event.recurrence_type==='none' ? 'selected' : '' %> data-bn="পুনরাবৃত্তি নেই" data-en="Does not repeat">পুনরাবৃত্তি নেই</option>
+        <option value="weekly" <%= isEdit && event.recurrence_type==='weekly' ? 'selected' : '' %> data-bn="প্রতি সপ্তাহে" data-en="Every week">প্রতি সপ্তাহে</option>
+        <option value="monthly" <%= isEdit && event.recurrence_type==='monthly' ? 'selected' : '' %> data-bn="প্রতি মাসে" data-en="Every month">প্রতি মাসে</option>
+      </select>
+    </div>
+    <div class="col-md-4 col-sm-6" data-recurrence-until-wrap>
+      <label class="form-label" data-bn="পুনরাবৃত্তির শেষ তারিখ" data-en="Repeat until">পুনরাবৃত্তির শেষ তারিখ</label>
+      <input type="date" name="recurrence_until" class="form-control" value="<%= isEdit && event.recurrence_until ? event.recurrence_until.toISOString().slice(0,10) : '' %>" data-recurrence-until />
+      <small class="text-muted" data-bn="খালি রাখলে এক বছর পর্যন্ত ক্যালেন্ডারে দেখাবে।" data-en="Leave empty to show occurrences for one year.">খালি রাখলে এক বছর পর্যন্ত ক্যালেন্ডারে দেখাবে।</small>
+    </div>
+
+    <div class="col-12">
+      <div class="form-check form-switch mt-2">
+        <input class="form-check-input" type="checkbox" name="is_active" id="isActiveSwitch" value="true" <%= !isEdit || event.is_active ? 'checked' : '' %>>
+        <label class="form-check-label font-weight-bold" for="isActiveSwitch">সক্রিয় রাখুন (ল্যান্ডিং পেজে প্রদর্শন করার জন্য)</label>
+      </div>
+    </div>
+
+    <div class="col-12 mt-4">
+      <button class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> সংরক্ষণ করুন</button>
+    </div>
+  </form>
+</div></div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const select = document.querySelector('[data-event-recurrence]');
+  const wrap = document.querySelector('[data-recurrence-until-wrap]');
+  const start = document.querySelector('[data-event-start-time]');
+  const end = document.querySelector('[data-event-end-time]');
+  const eventDate = document.querySelector('[data-event-date]');
+  const recurrenceUntil = document.querySelector('[data-recurrence-until]');
+  function syncRecurrence() {
+    if (wrap) wrap.style.display = select && select.value !== 'none' ? '' : 'none';
+  }
+  function syncTimes() {
+    if (!start || !end) return;
+    end.min = start.value || '';
+    const invalid = Boolean(start.value && end.value && end.value <= start.value);
+    end.setCustomValidity(invalid ? 'End time must be later than start time.' : '');
+  }
+  function syncRecurrenceDate() {
+    if (!eventDate || !recurrenceUntil) return;
+    recurrenceUntil.min = eventDate.value || '';
+    const invalid = Boolean(
+      recurrenceUntil.value &&
+      eventDate.value &&
+      recurrenceUntil.value < eventDate.value
+    );
+    recurrenceUntil.setCustomValidity(
+      invalid ? 'Repeat-until date cannot be earlier than the event date.' : ''
+    );
+  }
+  if (select) select.addEventListener('change', syncRecurrence);
+  if (start) start.addEventListener('change', syncTimes);
+  if (end) end.addEventListener('change', syncTimes);
+  if (eventDate) eventDate.addEventListener('change', syncRecurrenceDate);
+  if (recurrenceUntil) recurrenceUntil.addEventListener('change', syncRecurrenceDate);
+  syncRecurrence();
+  syncTimes();
+  syncRecurrenceDate();
+});
+</script>

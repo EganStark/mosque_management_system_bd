@@ -1,0 +1,285 @@
+﻿<div
+  class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4"
+>
+  <div>
+    <p class="text-uppercase text-primary fw-bold small mb-1">
+      <%= item.application_no %>
+    </p>
+    <h3 class="mb-1"><%= item.beneficiary_name %></h3>
+    <p class="text-muted mb-0">
+      <%= item.assistance_type %> · <%= item.fund_source %> তহবিল · <%=
+      item.urgency %>
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="/welfare" class="btn btn-outline-secondary">সব আবেদন</a
+    ><button onclick="window.print()" class="btn btn-outline-primary">
+      <i class="bi bi-printer me-1"></i> প্রিন্ট
+    </button>
+  </div>
+</div>
+<div class="row g-4 mb-4">
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header">আবেদন ও উপকারভোগীর তথ্য</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">অবস্থা</dt>
+          <dd class="col-sm-8">
+            <strong
+              ><%= ({pending:'অপেক্ষমান',approved:'অনুমোদিত',partial:'আংশিক বিতরণ',paid:'সম্পূর্ণ বিতরণ',rejected:'বাতিল'})[item.status] %></strong
+            >
+          </dd>
+          <dt class="col-sm-4">মোবাইল</dt>
+          <dd class="col-sm-8"><%= item.phone||'—' %></dd>
+          <dt class="col-sm-4">ঠিকানা</dt>
+          <dd class="col-sm-8"><%= item.address||'—' %></dd>
+          <dt class="col-sm-4">পরিবার</dt>
+          <dd class="col-sm-8">
+            <%= item.household_size?bn.num(item.household_size)+' জন':'—' %>
+          </dd>
+          <dt class="col-sm-4">মাসিক আয়</dt>
+          <dd class="col-sm-8">
+            <%= item.monthly_income?'৳ '+bn.money(item.monthly_income):'—' %>
+          </dd>
+          <dt class="col-sm-4">যোগ্যতা</dt>
+          <dd class="col-sm-8">
+            <%= item.eligibility_status === 'eligible' ? 'যোগ্য' : item.eligibility_status === 'ineligible' ? 'অযোগ্য' : 'যাচাই হয়নি' %>
+          </dd>
+          <dt class="col-sm-4">আবেদনের কারণ</dt>
+          <dd class="col-sm-8"><%= item.reason %></dd>
+          <dt class="col-sm-4">সিদ্ধান্ত নোট</dt>
+          <dd class="col-sm-8"><%= item.decision_notes||'—' %></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header">সহায়তার হিসাব</div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <span>আবেদন</span
+          ><strong>৳ <%= bn.money(item.requested_amount) %></strong>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>অনুমোদিত</span
+          ><strong>৳ <%= bn.money(item.approved_amount) %></strong>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>বিতরণ</span
+          ><strong class="text-success"
+            >৳ <%= bn.money(item.disbursed_amount) %></strong
+          >
+        </div>
+        <div class="d-flex justify-content-between border-top pt-2">
+          <span>অবশিষ্ট</span
+          ><strong class="text-danger"
+            >৳ <%=
+            bn.money(Number(item.approved_amount)-Number(item.disbursed_amount))
+            %></strong
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% if(currentUser.role==='admin'){ %>
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">যোগ্যতা যাচাই</div>
+      <div class="card-body">
+        <form
+          method="post"
+          action="/welfare/beneficiaries/<%= item.beneficiary_id %>/verify"
+          class="row g-3"
+        >
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div class="col-md-5">
+            <select name="eligibility_status" class="form-select">
+              <option value="eligible">যোগ্য</option>
+              <option value="ineligible">অযোগ্য</option>
+              <option value="pending">পুনরায় যাচাই</option>
+            </select>
+          </div>
+          <div class="col-md-7">
+            <input
+              name="verification_notes"
+              value="<%= item.verification_notes||'' %>"
+              class="form-control"
+              placeholder="যাচাই নোট"
+            />
+          </div>
+          <div class="col-12">
+            <button class="btn btn-outline-primary">যোগ্যতা সংরক্ষণ</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">আবেদনের সিদ্ধান্ত</div>
+      <div class="card-body">
+        <% if(item.status==='pending'){ %>
+        <form
+          method="post"
+          action="/welfare/<%= item.id %>/decision"
+          class="row g-3"
+        >
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div class="col-md-6">
+            <select name="status" class="form-select">
+              <option value="approved">অনুমোদন</option>
+              <option value="rejected">প্রত্যাখ্যান</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              name="approved_amount"
+              value="<%= item.requested_amount %>"
+              class="form-control"
+              placeholder="অনুমোদিত পরিমাণ"
+            />
+          </div>
+          <div class="col-12">
+            <textarea
+              name="decision_notes"
+              class="form-control"
+              placeholder="সিদ্ধান্তের কারণ"
+            ></textarea>
+          </div>
+          <div class="col-12">
+            <button class="btn btn-primary">সিদ্ধান্ত সংরক্ষণ</button>
+          </div>
+        </form>
+        <% }else{ %>
+        <p class="text-muted mb-0">
+          এই আবেদনের সিদ্ধান্ত ইতিমধ্যে দেওয়া হয়েছে।
+        </p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %> <%
+if(currentUser.role!=='viewer'&&['approved','partial'].includes(item.status)){
+var remaining=Number(item.approved_amount)-Number(item.disbursed_amount); %>
+<div class="card mb-4">
+  <div class="card-header">সহায়তা বিতরণের অনুরোধ</div>
+  <div class="card-body">
+    <form
+      method="post"
+      action="/welfare/<%= item.id %>/disbursements"
+      class="row g-3"
+    >
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <div class="col-md-3">
+        <label class="form-label">পরিমাণ</label
+        ><input
+          type="number"
+          min="0.01"
+          max="<%= remaining %>"
+          step="0.01"
+          name="amount"
+          class="form-control"
+          required
+        />
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">তারিখ</label
+        ><input
+          type="date"
+          name="disbursement_date"
+          value="<%= new Date().toISOString().slice(0,10) %>"
+          class="form-control"
+          required
+        />
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">পদ্ধতি</label
+        ><select name="payment_method" class="form-select">
+          <option value="cash">নগদ</option>
+          <option value="bank">ব্যাংক</option>
+          <option value="mobile_banking">মোবাইল ব্যাংকিং</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">রেফারেন্স</label
+        ><input name="reference" class="form-control" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">ব্যাংক হিসাব (শুধু ব্যাংক পেমেন্টে)</label>
+        <select name="bank_id" class="form-select">
+          <option value="">ব্যাংক নির্বাচন করুন</option>
+          <% banks.forEach(function(bank){ %>
+          <option value="<%= bank.id %>"><%= bank.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">মোবাইল ওয়ালেট (শুধু মোবাইল পেমেন্টে)</label>
+        <select name="mobile_wallet_id" class="form-select">
+          <option value="">ওয়ালেট নির্বাচন করুন</option>
+          <% wallets.forEach(function(wallet){ %>
+          <option value="<%= wallet.id %>"><%= wallet.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-12">
+        <label class="form-label">মন্তব্য</label
+        ><input name="remarks" class="form-control" />
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary">অনুমোদনের জন্য জমা দিন</button>
+      </div>
+    </form>
+  </div>
+</div>
+<% } %>
+<div class="card mb-4">
+  <div class="card-header">বিতরণ অনুমোদন সারি</div>
+  <div class="card-body"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>তারিখ</th><th>পদ্ধতি</th><th>আবেদনকারী</th><th>অবস্থা</th><th class="text-end">পরিমাণ</th><th></th></tr></thead><tbody>
+    <% item.disbursementRequests.forEach(function(request){ %><tr><td><%= bn.date(request.disbursement_date) %></td><td><%= request.payment_method==='bank'?(request.bank_name||'ব্যাংক'):request.payment_method==='mobile_banking'?(request.wallet_name||'মোবাইল ব্যাংকিং'):'নগদ' %></td><td><%= request.requester_name||'—' %><small class="d-block text-muted"><%= bn.date(request.requested_at) %></small></td><td><span class="badge text-bg-<%= request.status==='approved'?'success':request.status==='rejected'?'danger':request.status==='processing'?'info':'warning' %>"><%= ({pending:'অপেক্ষমাণ',processing:'প্রক্রিয়াধীন',approved:'ছাড় হয়েছে',rejected:'প্রত্যাখ্যাত'})[request.status] %></span><% if(request.decision_notes){ %><small class="d-block text-muted"><%= request.decision_notes %></small><% } %></td><td class="text-end">৳ <%= bn.money(request.amount) %></td><td><% if(currentUser.role==='admin'&&request.status==='pending'){ %><form method="post" action="/welfare/<%= item.id %>/disbursements/<%= request.id %>/decision" class="d-flex gap-1"><input type="hidden" name="_csrf" value="<%= csrfToken %>"/><input name="decision_notes" class="form-control form-control-sm" placeholder="মন্তব্য"/><input name="budget_override_reason" class="form-control form-control-sm" placeholder="বাজেট ছাড়ের কারণ (প্রয়োজনে)"/><button name="decision" value="approve" class="btn btn-sm btn-success" onclick="return confirm('অর্থ ছাড় করবেন?')">ছাড়</button><button name="decision" value="reject" class="btn btn-sm btn-outline-danger">প্রত্যাখ্যান</button></form><% } %></td></tr><% }) %>
+    <% if(!item.disbursementRequests.length){ %><tr><td colspan="6" class="text-center text-muted">কোনো বিতরণ অনুরোধ নেই</td></tr><% } %>
+  </tbody></table></div></div>
+</div>
+<div class="card">
+  <div class="card-header">বিতরণের ইতিহাস</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>তারিখ</th>
+            <th>পদ্ধতি</th>
+            <th>রেফারেন্স</th>
+            <th>বিতরণকারী</th>
+            <th>ভাউচার</th>
+            <th class="text-end">পরিমাণ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% item.disbursements.forEach(function(d){ %>
+          <tr>
+            <td><%= bn.date(d.disbursement_date) %></td>
+            <td><%= d.payment_method %></td>
+            <td><%= d.reference||'—' %></td>
+            <td><%= d.disbursed_by_name||'—' %></td>
+            <td><a href="/expenses/<%= d.expense_id %>/voucher">দেখুন</a></td>
+            <td class="text-end">৳ <%= bn.money(d.amount) %></td>
+          </tr>
+          <% }); %><% if(!item.disbursements.length){ %>
+          <tr>
+            <td colspan="6" class="text-center text-muted">এখনও বিতরণ হয়নি</td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,34 @@
 // Authentication & role-based access control middleware.
+const db = require('../config/db');
+
+async function refreshAuthenticatedUser(req, res, next) {
+  const sessionUser = req.session && req.session.user;
+  if (!sessionUser) return next();
+  try {
+    const user = await db('users')
+      .where({ id: sessionUser.id })
+      .select('id', 'name', 'username', 'role', 'is_active')
+      .first();
+    if (user && user.is_active) {
+      req.session.user = {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        role: user.role,
+      };
+      return next();
+    }
+    return req.session.destroy(() => {
+      res.clearCookie('brjm.sid');
+      if (req.accepts('json') && !req.accepts('html')) {
+        return res.status(401).json({ error: 'Account inactive' });
+      }
+      return res.redirect('/login');
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
 
 function requireAuth(req, res, next) {
   if (req.session && req.session.user) return next();
@@ -35,4 +65,4 @@ function requireRole(roles) {
 const canWrite = requireRole(['admin', 'collector']);
 const adminOnly = requireRole(['admin']);
 
-module.exports = { requireAuth, requireRole, canWrite, adminOnly };
+module.exports = { refreshAuthenticatedUser, requireAuth, requireRole, canWrite, adminOnly };

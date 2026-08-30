@@ -1,7 +1,7 @@
 {
-  "name": "baitur-rahman-admin",
+  "name": "mosque-management-system",
   "version": "1.0.0",
-  "description": "Admin panel for Baitur Rahman Jame Mosjid (members, collections, expenses, bank, reports)",
+  "description": "Bilingual mosque management system with a public website and comprehensive administration dashboard",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -10,17 +10,25 @@
     "migrate:rollback": "knex migrate:rollback",
     "seed": "knex seed:run",
     "db:setup": "node scripts/create-db.js",
-    "test": "cross-env NODE_ENV=test jest --runInBand --forceExit"
+    "test": "cross-env NODE_ENV=test jest --runInBand --forceExit",
+    "test:db": "node scripts/ensure-test-db.js",
+    "release:check-env": "node scripts/check-production-env.js",
+    "release:preflight": "node scripts/production-preflight.js",
+    "backup:database": "node scripts/scheduled-database-backup.js"
   },
   "keywords": [
-    "mosque",
-    "admin",
+    "mosque-management",
+    "admin-dashboard",
     "express",
     "postgres"
   ],
   "author": "",
   "license": "MIT",
+  "engines": {
+    "node": ">=20 <23"
+  },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.4",
     "bcryptjs": "^3.0.3",
     "connect-flash": "^0.1.1",
     "connect-pg-simple": "^9.0.1",

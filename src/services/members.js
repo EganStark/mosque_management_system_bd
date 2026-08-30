@@ -70,6 +70,7 @@ async function nextIdNo() {
 async function create(data, children = []) {
   return db.transaction(async (trx) => {
     const payload = clean(data);
+    payload.status = 'active';
     if (!payload.id_no) {
       const row = await trx('members')
         .select(trx.raw("MAX(NULLIF(regexp_replace(id_no, '[^0-9]', '', 'g'), '')::int) as max_no"))
@@ -84,7 +85,9 @@ async function create(data, children = []) {
 
 async function update(id, data, children = null) {
   return db.transaction(async (trx) => {
-    await trx('members').where({ id }).update(clean(data));
+    const payload = clean(data);
+    delete payload.status;
+    await trx('members').where({ id }).update(payload);
     if (children !== null) {
       await trx('member_children').where({ member_id: id }).del();
       await insertChildren(trx, id, children);
@@ -108,13 +111,23 @@ async function insertChildren(trx, memberId, children) {
   if (rows.length) await trx('member_children').insert(rows);
 }
 
-async function remove(id) {
-  return db('members').where({ id }).del();
+async function setStatus(id, status, reason) {
+  if (!['active', 'deactive'].includes(status)) throw new Error('Invalid member status');
+  if (status === 'deactive' && !String(reason || '').trim())
+    throw new Error('Archive reason is required');
+  return db.transaction(async (trx) => {
+    const member = await trx('members').where({ id }).forUpdate().first();
+    if (!member) throw new Error('Member not found');
+    if (member.status === status) throw new Error(status === 'active' ? 'Member is already active' : 'Member is already archived');
+    await trx('members').where({ id }).update({ status, updated_at: trx.fn.now() });
+    return trx('members').where({ id }).first();
+  });
 }
 
 /** Lightweight options for Select2 reference/member pickers. */
 async function options() {
   return db('members')
+    .where({ status: 'active' })
     .select('id', 'id_no', 'name', 'phone')
     .orderBy('id_no', 'asc');
 }
@@ -132,4 +145,26 @@ async function counts() {
   };
 }
 
-module.exports = { list, find, findFull, nextIdNo, create, update, remove, options, counts, MEMBER_COLUMNS };
+async function financialSummary(id) {
+  const [collectionTotalRow, billRow, recentCollections, monthlyBills] = await Promise.all([
+    db('collections').where({ member_id: id, status: 'posted' }).sum('amount as total').first(),
+    db('monthly_bills').where({ member_id: id }).select(
+      db.raw('COALESCE(SUM(amount_due),0) as total_due'),
+      db.raw('COALESCE(SUM(amount_paid),0) as total_paid'),
+      db.raw('COALESCE(SUM(amount_due - amount_paid),0) as outstanding')
+    ).first(),
+    db('collections as c').leftJoin('collection_categories as cc', 'c.collection_category_id', 'cc.id')
+      .select('c.*', 'cc.name as category_name').where('c.member_id', id).orderBy('c.date', 'desc').limit(8),
+    db('monthly_bills').where({ member_id: id }).orderBy('billing_month', 'desc').limit(12),
+  ]);
+  return {
+    totalCollections: Number(collectionTotalRow.total || 0),
+    totalDue: Number(billRow.total_due || 0),
+    totalPaid: Number(billRow.total_paid || 0),
+    outstanding: Number(billRow.outstanding || 0),
+    recentCollections,
+    monthlyBills,
+  };
+}
+
+module.exports = { list, find, findFull, nextIdNo, create, update, setStatus, options, counts, financialSummary, MEMBER_COLUMNS };

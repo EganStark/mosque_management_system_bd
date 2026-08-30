@@ -1,0 +1,10 @@
+const express = require('express');
+const { body, validationResult } = require('express-validator');
+const { requireAuth, adminOnly } = require('../middleware/auth');
+const budgets = require('../services/budgets');
+const router = express.Router();
+router.use(requireAuth);
+const currentMonth = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; };
+router.get('/', async (req, res, next) => { try { const month = /^\d{4}-\d{2}$/.test(req.query.month || '') ? req.query.month : currentMonth(); res.render('budgets/index', { title: 'বাজেট পরিকল্পনা', data: await budgets.planner(month) }); } catch (err) { next(err); } });
+router.post('/lines', adminOnly, body('month').matches(/^\d{4}-\d{2}$/), body('line_type').isIn(['income', 'expense']), body('reference_id').isInt({ min: 1 }), body('budget_amount').isFloat({ min: 0 }), async (req, res) => { try { if (!validationResult(req).isEmpty()) throw new Error('বাজেটের তথ্য সঠিকভাবে দিন।'); await budgets.saveLine(req.body, req.session.user.id); req.flash('success', 'বাজেট খাত হালনাগাদ হয়েছে।'); } catch (err) { req.flash('error', err.message); } res.redirect(`/budgets?month=${encodeURIComponent(req.body.month || currentMonth())}`); });
+module.exports = router;

@@ -1,63 +1,14 @@
-<%
-  function row(label, value){ return value ? '<tr><th class="w-25">'+label+'</th><td>'+value+'</td></tr>' : ''; }
-%>
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="mb-0"><%= member.name %> <small class="text-muted">(<%= bn.toBnDigits(member.id_no) %>)</small></h3>
-  <div class="no-print">
-    <% if (currentUser.role !== 'viewer') { %><a href="/members/<%= member.id %>/edit" class="btn btn-primary btn-sm"><i class="bi bi-pencil"></i> সম্পাদনা</a><% } %>
-    <button onclick="window.print()" class="btn btn-outline-secondary btn-sm"><i class="bi bi-printer"></i> প্রিন্ট</button>
-    <a href="/members" class="btn btn-light btn-sm">ফিরে যান</a>
-  </div>
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+  <div><p class="text-uppercase text-primary fw-bold small mb-1">Member profile</p><h3 class="mb-1"><%= member.name %></h3><p class="text-muted mb-0">সদস্য আইডি: <%= bn.toBnDigits(member.id_no) %> · <%= member.status==='active'?'সক্রিয় সদস্য':'নিষ্ক্রিয় সদস্য' %></p></div>
+  <div class="no-print d-flex flex-wrap gap-2"><% if(currentUser.role!=='viewer'){ %><a href="/members/<%= member.id %>/edit" class="btn btn-primary"><i class="bi bi-pencil me-1"></i> সম্পাদনা</a><% } %><a href="/members/<%= member.id %>/card" class="btn btn-outline-primary"><i class="bi bi-person-badge me-1"></i> সদস্য কার্ড</a><button onclick="window.print()" class="btn btn-outline-secondary"><i class="bi bi-printer me-1"></i> প্রিন্ট</button><% if(currentUser.role==='admin'){ %><form method="post" action="/members/<%= member.id %>/status" class="d-flex gap-2"><input type="hidden" name="_csrf" value="<%= csrfToken %>"/><input type="hidden" name="status" value="<%= member.status==='active'?'deactive':'active' %>"/><% if(member.status==='active'){ %><input name="reason" class="form-control" placeholder="আর্কাইভের কারণ" required/><% } %><button class="btn <%= member.status==='active'?'btn-outline-danger':'btn-outline-success' %>" onclick="return confirm('সদস্যের অবস্থা পরিবর্তন করবেন?')"><%= member.status==='active'?'আর্কাইভ':'পুনরায় সক্রিয়' %></button></form><% } %></div>
 </div>
 
-<div class="row g-3">
-  <div class="col-md-3 text-center">
-    <% if (member.photo) { %><img src="<%= member.photo %>" class="img-fluid rounded shadow-sm" style="max-height:220px" /><% } else { %><i class="bi bi-person-circle" style="font-size:8rem;color:#ccc"></i><% } %>
-    <div class="mt-2"><span class="badge bg-<%= member.status==='active'?'success':'secondary' %>"><%= member.status==='active'?'সক্রিয়':'নিষ্ক্রিয়' %></span></div>
-  </div>
-  <div class="col-md-9">
-    <div class="card"><div class="card-header">মূল তথ্য</div><div class="card-body p-0"><table class="table table-sm mb-0">
-      <%- row('মোবাইল', bn.toBnDigits(member.phone||'')) %>
-      <%- row('অন্যান্য মোবাইল', bn.toBnDigits(member.other_phones||'')) %>
-      <%- row('লিঙ্গ', member.gender==='female'?'মহিলা':'পুরুষ') %>
-      <%- row('পেশা', member.occupation_name) %>
-      <%- row('জন্ম তারিখ', bn.date(member.birth_date)) %>
-      <%- row('রেফারেন্স', member.reference_name ? (bn.toBnDigits(member.reference_id_no||'')+' - '+member.reference_name) : '') %>
-      <%- row('মাসিক পরিশোধ', member.monthly_payment ? ('হ্যাঁ ('+bn.money(member.monthly_payment_amount)+')') : 'না') %>
-    </table></div></div>
-  </div>
-</div>
+<div class="row g-4 mb-4"><div class="col-lg-4"><div class="card h-100"><div class="card-body text-center p-4"><% if(member.photo){ %><img src="<%= member.photo %>" class="rounded-4 object-fit-cover mb-3" style="width:130px;height:150px" alt="<%= member.name %>"/><% }else{ %><div class="mx-auto mb-3 rounded-4 d-grid place-items-center bg-light" style="width:130px;height:150px"><i class="bi bi-person fs-1 text-muted"></i></div><% } %><h4 class="mb-1"><%= member.name %></h4><p class="text-muted mb-3"><%= member.occupation_name||'সদস্য' %></p><div class="d-flex justify-content-center gap-2"><span class="badge <%= member.status==='active'?'bg-success-subtle text-success':'bg-secondary-subtle text-secondary' %>"><%= member.status==='active'?'সক্রিয়':'নিষ্ক্রিয়' %></span><% if(member.monthly_payment){ %><span class="badge bg-primary-subtle text-primary">মাসিক চাঁদা</span><% } %></div></div></div></div>
+<div class="col-lg-8"><div class="card h-100"><div class="card-header">যোগাযোগ ও সদস্য তথ্য</div><div class="card-body"><div class="row g-4"><div class="col-sm-6"><p class="small text-muted mb-1">মোবাইল</p><strong><%= bn.toBnDigits(member.phone||'—') %></strong></div><div class="col-sm-6"><p class="small text-muted mb-1">লিঙ্গ</p><strong><%= member.gender==='female'?'মহিলা':'পুরুষ' %></strong></div><div class="col-sm-6"><p class="small text-muted mb-1">জন্ম তারিখ</p><strong><%= member.birth_date?bn.date(member.birth_date):'—' %></strong></div><div class="col-sm-6"><p class="small text-muted mb-1">মাসিক চাঁদা</p><strong><%= member.monthly_payment?'৳ '+bn.money(member.monthly_payment_amount):'প্রযোজ্য নয়' %></strong></div><div class="col-12"><p class="small text-muted mb-1">ঠিকানা</p><strong><%= [member.address_text,member.area_name,member.village_name,member.thana_name,member.district_name].filter(Boolean).join(', ')||'—' %></strong></div></div></div></div></div></div>
 
-<div class="card mt-3"><div class="card-header">ঠিকানা</div><div class="card-body p-0"><table class="table table-sm mb-0">
-  <%- row('বিভাগ', member.division_name) %>
-  <%- row('জেলা', member.district_name) %>
-  <%- row('থানা', member.thana_name) %>
-  <%- row('পোস্ট অফিস', member.post_office_name) %>
-  <%- row('গ্রাম', member.village_name) %>
-  <%- row('এলাকা', member.area_name) %>
-  <%- row('পোস্ট কোড', bn.toBnDigits(member.post_code||'')) %>
-  <%- row('বিস্তারিত', member.address_text) %>
-</table></div></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4"><div class="card"><div class="card-body"><p class="small text-muted mb-1">সর্বমোট আদায়</p><h4 class="text-success mb-0">৳ <%= bn.money(finance.totalCollections) %></h4></div></div><div class="card"><div class="card-body"><p class="small text-muted mb-1">মাসিক বিল</p><h4 class="mb-0">৳ <%= bn.money(finance.totalDue) %></h4></div></div><div class="card"><div class="card-body"><p class="small text-muted mb-1">মাসিক পরিশোধ</p><h4 class="text-success mb-0">৳ <%= bn.money(finance.totalPaid) %></h4></div></div><div class="card"><div class="card-body"><p class="small text-muted mb-1">বর্তমান বকেয়া</p><h4 class="text-danger mb-0">৳ <%= bn.money(finance.outstanding) %></h4></div></div></div>
 
-<div class="row g-3 mt-0">
-  <div class="col-md-6"><div class="card h-100"><div class="card-header">পারিবারিক তথ্য</div><div class="card-body p-0"><table class="table table-sm mb-0">
-    <%- row('স্ত্রী', member.wife_name) %>
-    <%- row('স্বামী', member.husband_name) %>
-    <%- row('পিতা', member.father_name) %>
-    <%- row('মাতা', member.mother_name) %>
-    <%- row('দাদা', member.grandfather_name) %>
-    <%- row('দাদী', member.grandmother_name) %>
-  </table></div></div></div>
-  <div class="col-md-6"><div class="card h-100"><div class="card-header">সন্তান</div><div class="card-body">
-    <% if (member.children && member.children.length) { %>
-      <ul class="list-group list-group-flush">
-      <% member.children.forEach(function(c){ %>
-        <li class="list-group-item d-flex justify-content-between">
-          <span><%= c.name %></span>
-          <span class="badge bg-light text-dark"><%= c.type==='son'?'ছেলে':'মেয়ে' %></span>
-        </li>
-      <% }) %>
-      </ul>
-    <% } else { %><span class="text-muted">কোন তথ্য নেই</span><% } %>
-  </div></div></div>
-</div>
+<div class="row g-4 mb-4"><div class="col-lg-7"><div class="card h-100"><div class="card-header d-flex justify-content-between"><span>সাম্প্রতিক আদায়</span><a href="/collections/new" class="small no-print">নতুন আদায়</a></div><div class="card-body p-0"><div class="table-responsive"><table class="table mb-0"><thead><tr><th>তারিখ</th><th>খাত</th><th>রশিদ</th><th>পরিমাণ</th><th>অবস্থা</th></tr></thead><tbody><% finance.recentCollections.forEach(function(c){ %><tr><td><%= bn.date(c.date) %></td><td><%= c.category_name||c.purpose||'অন্যান্য' %></td><td><%= c.receipt_no||'—' %></td><td>৳ <%= bn.money(c.amount) %></td><td><%= c.status==='cancelled'?'বাতিল':'অনুমোদিত' %></td></tr><% }) %><% if(!finance.recentCollections.length){ %><tr><td colspan="5" class="text-center text-muted py-4">কোনো আদায় নেই</td></tr><% } %></tbody></table></div></div></div></div>
+<div class="col-lg-5"><div class="card h-100"><div class="card-header d-flex justify-content-between"><span>মাসিক চাঁদা লেজার</span><a href="/monthly-payments" class="small no-print">সব দেখুন</a></div><div class="card-body p-0"><div class="table-responsive"><table class="table mb-0"><thead><tr><th>মাস</th><th>বিল</th><th>বকেয়া</th><th>অবস্থা</th></tr></thead><tbody><% finance.monthlyBills.forEach(function(b){var due=Number(b.amount_due)-Number(b.amount_paid);%><tr><td><%= String(b.billing_month).slice(0,7) %></td><td>৳ <%= bn.money(b.amount_due) %></td><td>৳ <%= bn.money(due) %></td><td><%= b.status==='paid'?'পরিশোধিত':(b.status==='partial'?'আংশিক':'বকেয়া') %></td></tr><% }) %><% if(!finance.monthlyBills.length){ %><tr><td colspan="4" class="text-center text-muted py-4">কোনো মাসিক বিল নেই</td></tr><% } %></tbody></table></div></div></div></div></div>
+
+<details class="card mb-4"><summary class="card-header cursor-pointer">বিস্তারিত ঠিকানা ও পারিবারিক তথ্য</summary><div class="card-body"><div class="row g-4"><div class="col-md-6"><h6>ঠিকানা</h6><p class="text-muted"><%= [member.address_text,member.area_name,member.village_name,member.post_office_name,member.thana_name,member.district_name,member.division_name].filter(Boolean).join(', ')||'কোনো তথ্য নেই' %></p></div><div class="col-md-6"><h6>পরিবার</h6><p class="text-muted mb-1">পিতা: <%= member.father_name||'—' %></p><p class="text-muted mb-1">মাতা: <%= member.mother_name||'—' %></p><p class="text-muted mb-1">স্বামী/স্ত্রী: <%= member.wife_name||member.husband_name||'—' %></p><p class="text-muted mb-0">সন্তান: <%= member.children&&member.children.length?member.children.map(c=>c.name).join(', '):'—' %></p></div></div></div></details>

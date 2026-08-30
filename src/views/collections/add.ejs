@@ -1,34 +1,27 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="mb-0">নতুন আদায়</h3>
-  <a href="/collections" class="btn btn-outline-secondary btn-sm"><i class="bi bi-list"></i> তালিকা</a>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div><p class="text-uppercase text-primary fw-bold small mb-1">Finance</p><h3 class="mb-1">নতুন আদায়</h3><p class="text-muted mb-0">সদস্য চাঁদা, দান ও অন্যান্য আয় রেকর্ড করুন</p></div>
+  <a href="/collections" class="btn btn-outline-secondary btn-sm"><i class="bi bi-list me-1"></i> তালিকা</a>
 </div>
-<div class="card"><div class="card-body">
-  <form method="post" action="/collections" class="row g-3">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-    <div class="col-md-6"><label class="form-label required">সদস্য</label>
-      <select name="member_id" class="form-select select2" required>
-        <option value="">নির্বাচন করুন</option>
-        <% memberOptions.forEach(function(m){ %><option value="<%= m.id %>"><%= m.id_no %> - <%= m.name %><%= m.phone ? ' - '+m.phone : '' %></option><% }) %>
-      </select></div>
-    <div class="col-md-3"><label class="form-label required">পরিমাণ</label>
-      <input type="number" step="0.01" name="amount" class="form-control" required /></div>
-    <div class="col-md-3"><label class="form-label required">তারিখ</label>
-      <input type="text" name="date" class="form-control datepicker" value="<%= new Date().toISOString().slice(0,10) %>" required /></div>
-    <div class="col-md-4"><label class="form-label">উদ্দেশ্য</label>
-      <input type="text" name="purpose" class="form-control" /></div>
-    <div class="col-md-4"><label class="form-label">বই / রশিদ</label>
-      <select name="book_number_id" class="form-select">
-        <option value="">নির্বাচন করুন</option>
-        <% activeBooks.forEach(function(b){ %><option value="<%= b.id %>"><%= b.book_type_name||'' %> - <%= b.book_number %></option><% }) %>
-      </select></div>
-    <div class="col-md-2"><label class="form-label">রশিদ নং</label>
-      <input type="text" name="receipt_no" class="form-control" /></div>
-    <div class="col-md-2"><label class="form-label">অ্যাকাউন্ট</label>
-      <input type="text" name="account" class="form-control" /></div>
-    <div class="col-md-12"><label class="form-label">মন্তব্য</label>
-      <input type="text" name="remarks" class="form-control" /></div>
-    <div class="col-12">
-      <button class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> সংরক্ষণ</button>
-    </div>
-  </form>
-</div></div>
+<form method="post" action="/collections">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+  <div class="card mb-4"><div class="card-header">প্রদানকারীর তথ্য</div><div class="card-body"><div class="row g-3">
+    <div class="col-lg-7"><label class="form-label">নিবন্ধিত সদস্য</label><select name="member_id" class="form-select select2"><option value="">সদস্য না হলে খালি রাখুন</option><% memberOptions.forEach(function(m){ %><option value="<%= m.id %>"><%= m.id_no %> — <%= m.name %><%= m.phone ? ' — '+m.phone : '' %></option><% }) %></select></div>
+    <div class="col-lg-5"><label class="form-label">অন্য প্রদানকারীর নাম</label><input name="payer_name" class="form-control" placeholder="সদস্য না হলে নাম লিখুন" /></div>
+  </div></div></div>
+  <div class="card"><div class="card-header">আদায়ের বিবরণ</div><div class="card-body"><div class="row g-3">
+    <div class="col-md-4"><label class="form-label required">আদায়ের খাত</label><select name="collection_category_id" class="form-select" required><option value="">নির্বাচন করুন</option><% categories.forEach(function(c){ %><option value="<%= c.id %>"><%= c.name %></option><% }) %></select></div>
+    <div class="col-md-4"><label class="form-label required">পরিমাণ</label><div class="input-group"><span class="input-group-text">৳</span><input type="number" min="0.01" step="0.01" name="amount" class="form-control" required /></div></div>
+    <div class="col-md-4"><label class="form-label required">তারিখ</label><input type="text" name="date" class="form-control datepicker" value="<%= new Date().toISOString().slice(0,10) %>" required /></div>
+    <div class="col-md-4"><label class="form-label required">পেমেন্ট পদ্ধতি</label><select id="collectionPaymentMethod" name="payment_method" class="form-select" required><option value="cash">নগদ</option><option value="bank">ব্যাংক</option><option value="mobile_banking">মোবাইল ব্যাংকিং</option></select></div>
+    <div class="col-md-4" id="collectionBankField" hidden><label class="form-label">ব্যাংক হিসাব</label><select name="bank_id" class="form-select"><option value="">নির্বাচন করুন</option><% banks.forEach(function(b){ %><option value="<%= b.id %>"><%= b.name %></option><% }) %></select></div>
+    <div class="col-md-4" id="collectionWalletField" hidden><label class="form-label">মোবাইল ওয়ালেট</label><select name="mobile_wallet_id" class="form-select"><option value="">নির্বাচন করুন</option><% wallets.forEach(function(w){ %><option value="<%= w.id %>"><%= w.name %><%= w.account_number?' — '+w.account_number:'' %></option><% }) %></select></div>
+    <div class="col-md-4"><label class="form-label">লেনদেন রেফারেন্স</label><input name="transaction_reference" class="form-control" placeholder="চেক/ট্রানজেকশন আইডি" /></div>
+    <div class="col-md-4"><label class="form-label">রশিদ বই</label><select name="book_number_id" class="form-select"><option value="">নির্বাচন করুন</option><% activeBooks.forEach(function(b){ %><option value="<%= b.id %>"><%= b.book_type_name||'' %> — <%= b.book_number %></option><% }) %></select></div>
+    <div class="col-md-4"><label class="form-label">রশিদ নম্বর</label><input name="receipt_no" class="form-control" /></div>
+    <div class="col-md-4"><label class="form-label">পুরোনো অ্যাকাউন্ট/তহবিল</label><input name="account" class="form-control" /></div>
+    <div class="col-md-6"><label class="form-label">উদ্দেশ্য</label><input name="purpose" class="form-control" /></div>
+    <div class="col-md-6"><label class="form-label">মন্তব্য</label><input name="remarks" class="form-control" /></div>
+    <div class="col-12"><button class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> আদায় সংরক্ষণ</button></div>
+  </div></div></div>
+</form>
+<script>document.addEventListener('DOMContentLoaded',function(){var m=document.getElementById('collectionPaymentMethod'),f=document.getElementById('collectionBankField'),w=document.getElementById('collectionWalletField');function sync(){f.hidden=m.value!=='bank';w.hidden=m.value!=='mobile_banking';}m.addEventListener('change',sync);sync();});</script>

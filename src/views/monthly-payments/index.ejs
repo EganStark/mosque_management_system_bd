@@ -1,0 +1,24 @@
+﻿<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+  <div><p class="text-uppercase text-primary fw-bold small mb-1">Member finance</p><h3 class="mb-1">মাসিক চাঁদা</h3><p class="text-muted mb-0">মাসভিত্তিক বিল, আদায় এবং বকেয়া ব্যবস্থাপনা</p></div>
+  <div class="d-flex flex-wrap gap-2">
+    <form method="get" class="d-flex gap-2"><input type="month" name="month" value="<%= month %>" class="form-control"/><button class="btn btn-outline-secondary">দেখুন</button></form>
+    <% if(currentUser.role === 'admin'){ %><form method="post" action="/monthly-payments/generate" class="d-flex gap-2"><input type="hidden" name="_csrf" value="<%= csrfToken %>"/><input type="hidden" name="month" value="<%= month %>"/><button class="btn btn-primary"><i class="bi bi-lightning-charge me-1"></i> এই মাসের বিল তৈরি</button></form><% } %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-5">
+  <div class="card"><div class="card-body"><p class="text-muted small mb-1">মোট বিল</p><h4 class="mb-0"><%= bn.num(summary.billCount) %> জন</h4></div></div>
+  <div class="card"><div class="card-body"><p class="text-muted small mb-1">দাবিকৃত</p><h4 class="mb-0">৳ <%= bn.money(summary.totalDue) %></h4></div></div>
+  <div class="card"><div class="card-body"><p class="text-muted small mb-1">আদায় হয়েছে</p><h4 class="mb-0 text-success">৳ <%= bn.money(summary.totalPaid) %></h4></div></div>
+  <div class="card"><div class="card-body"><p class="text-muted small mb-1">মোট বকেয়া</p><h4 class="mb-0 text-danger">৳ <%= bn.money(summary.outstanding) %></h4></div></div>
+</div>
+
+<div class="card"><div class="card-body"><div class="table-responsive"><table class="table table-hover datatable w-100">
+  <thead><tr><th>#</th><th>সদস্য</th><th>মোবাইল</th><th>মাসিক বিল</th><th>পরিশোধ</th><th>বকেয়া</th><th>অবস্থা</th><th class="no-print">অ্যাকশন</th></tr></thead>
+  <tbody><% rows.forEach(function(row,i){ var outstanding=Number(row.amount_due)-Number(row.amount_paid); %><tr>
+    <td><%= bn.toBnDigits(i+1) %></td><td><strong><%= row.member_name %></strong><small class="d-block text-muted">আইডি: <%= bn.toBnDigits(row.member_id_no) %></small></td><td><%= row.phone || '—' %></td>
+    <td>৳ <%= bn.money(row.amount_due) %></td><td class="text-success">৳ <%= bn.money(row.amount_paid) %></td><td class="fw-bold <%= outstanding>0?'text-danger':'text-success' %>">৳ <%= bn.money(outstanding) %></td>
+    <td><span class="badge <%= row.status==='paid'?'bg-success-subtle text-success':(row.status==='partial'?'bg-warning-subtle text-warning':'bg-danger-subtle text-danger') %>"><%= row.status==='paid'?'পরিশোধিত':(row.status==='partial'?'আংশিক':'বকেয়া') %></span></td>
+    <td class="no-print"><a href="/monthly-payments/<%= row.id %>/pay" class="btn btn-sm <%= outstanding>0?'btn-primary':'btn-outline-secondary' %>"><i class="bi bi-receipt me-1"></i><%= outstanding>0?'পেমেন্ট':'বিস্তারিত' %></a></td>
+  </tr><% }) %></tbody>
+</table></div></div></div>

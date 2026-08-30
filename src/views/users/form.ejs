@@ -19,9 +19,15 @@
         <option value="collector" <%= sel('collector') %>>কালেক্টর</option>
         <option value="viewer" <%= isEdit?sel('viewer'):'selected' %>>ভিউয়ার</option>
       </select></div>
+    <% if (!isEdit) { %>
     <div class="col-md-3 d-flex align-items-end">
-      <div class="form-check"><input type="checkbox" name="is_active" class="form-check-input" id="active" <%= !isEdit || user.is_active ? 'checked':'' %> /><label for="active" class="form-check-label">সক্রিয়</label></div>
+      <div class="form-check"><input type="checkbox" name="is_active" class="form-check-input" id="active" checked /><label for="active" class="form-check-label">সক্রিয়</label></div>
     </div>
+    <% } else { %>
+    <div class="col-md-3 d-flex align-items-end">
+      <span class="badge bg-<%= user.is_active ? 'success' : 'secondary' %> mb-2"><%= user.is_active ? 'সক্রিয় অ্যাকাউন্ট' : 'নিষ্ক্রিয় অ্যাকাউন্ট' %></span>
+    </div>
+    <% } %>
     <div class="col-md-6"><label class="form-label <%= isEdit?'':'required' %>">পাসওয়ার্ড <% if(isEdit){ %><small class="text-muted">(পরিবর্তন না করলে খালি রাখুন)</small><% } %></label>
       <input type="password" name="password" class="form-control" <%= isEdit?'':'required' %> /></div>
     <div class="col-12"><button class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> সংরক্ষণ</button></div>

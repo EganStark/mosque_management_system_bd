@@ -1,0 +1,195 @@
+<% var due=Number(item.pledged_amount)-Number(item.paid_amount); %>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <p class="text-uppercase text-primary fw-bold small mb-1">
+      <%= item.pledge_no %>
+    </p>
+    <h3><%= item.donor_name %></h3>
+    <p class="text-muted mb-0"><%= item.purpose %></p>
+  </div>
+  <a href="/pledges" class="btn btn-outline-secondary">সব অঙ্গীকার</a>
+</div>
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">অঙ্গীকারের হিসাব</div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-3">
+          <span>মোট অঙ্গীকার</span
+          ><strong>৳ <%= bn.money(item.pledged_amount) %></strong>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+          <span>আদায়</span><strong>৳ <%= bn.money(item.paid_amount) %></strong>
+        </div>
+        <div class="d-flex justify-content-between border-top pt-3">
+          <span>বকেয়া</span>
+          <h4>৳ <%= bn.money(due) %></h4>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">যোগাযোগ</div>
+      <div class="card-body">
+        <p>মোবাইল: <%= item.phone||'—' %></p>
+        <p>শেষ তারিখ: <%= item.due_date?bn.date(item.due_date):'—' %></p>
+        <p>
+          পরবর্তী ফলো-আপ: <%=
+          item.next_follow_up_date?bn.date(item.next_follow_up_date):'—' %>
+        </p>
+        <p class="mb-0">নোট: <%= item.follow_up_notes||'—' %></p>
+      </div>
+    </div>
+  </div>
+</div>
+<% if(currentUser.role!=='viewer'){ %>
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">ফলো-আপ হালনাগাদ</div>
+      <div class="card-body">
+        <form
+          method="post"
+          action="/pledges/<%= item.id %>/follow-up"
+          class="row g-3"
+        >
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div class="col-12">
+            <select name="follow_up_status" class="form-select">
+              <option value="contacted">যোগাযোগ হয়েছে</option>
+              <option value="promised">পরিশোধের প্রতিশ্রুতি</option>
+              <option value="unreachable">যোগাযোগ পাওয়া যায়নি</option>
+              <option value="declined">অস্বীকৃতি</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <input type="date" name="last_contact_date" class="form-control" />
+          </div>
+          <div class="col-md-6">
+            <input
+              type="date"
+              name="next_follow_up_date"
+              class="form-control"
+            />
+          </div>
+          <div class="col-12">
+            <input
+              name="follow_up_notes"
+              value="<%= item.follow_up_notes||'' %>"
+              class="form-control"
+              placeholder="নোট"
+            />
+          </div>
+          <div class="col-12">
+            <button class="btn btn-outline-primary">সংরক্ষণ</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">টাকা গ্রহণ ও রশিদ</div>
+      <div class="card-body">
+        <% if(due>0){ %>
+        <form
+          method="post"
+          action="/pledges/<%= item.id %>/payments"
+          class="row g-3"
+        >
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div class="col-md-6">
+            <input
+              type="number"
+              min="0.01"
+              max="<%= due %>"
+              step="0.01"
+              name="amount"
+              class="form-control"
+              placeholder="পরিমাণ"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <input
+              type="date"
+              name="payment_date"
+              value="<%= new Date().toISOString().slice(0,10) %>"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <select name="payment_method" class="form-select">
+              <option value="cash">নগদ</option>
+              <option value="bank">ব্যাংক</option>
+              <option value="mobile_banking">মোবাইল ব্যাংকিং</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <select name="bank_id" class="form-select">
+              <option value="">ব্যাংক হিসাব</option>
+              <% banks.forEach(function(b){ %>
+              <option value="<%= b.id %>"><%= b.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <select name="mobile_wallet_id" class="form-select">
+              <option value="">মোবাইল ওয়ালেট</option>
+              <% wallets.forEach(function(wallet){ %>
+              <option value="<%= wallet.id %>"><%= wallet.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-12">
+            <input
+              name="transaction_reference"
+              class="form-control"
+              placeholder="লেনদেন রেফারেন্স"
+            />
+          </div>
+          <div class="col-12">
+            <button class="btn btn-success">গ্রহণ ও রশিদ তৈরি</button>
+          </div>
+        </form>
+        <% }else{ %>
+        <p class="text-success">সম্পূর্ণ আদায় হয়েছে।</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>
+<div class="card">
+  <div class="card-header">আদায়ের ইতিহাস</div>
+  <div class="card-body">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>তারিখ</th>
+          <th>রশিদ</th>
+          <th>পদ্ধতি</th>
+          <th>অবস্থা</th>
+          <th class="text-end">পরিমাণ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% item.payments.forEach(function(p){ %>
+        <tr>
+          <td><%= bn.date(p.payment_date) %></td>
+          <td>
+            <a href="/collections/<%= p.collection_id %>/receipt"
+              ><%= p.receipt_no %></a
+            >
+          </td>
+          <td><%= p.payment_method %></td>
+          <td><%= p.status %></td>
+          <td class="text-end">৳ <%= bn.money(p.amount) %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

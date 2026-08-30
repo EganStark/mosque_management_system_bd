@@ -1,0 +1,140 @@
+<%
+  const isEdit = image !== null;
+  const action = isEdit ? `/landing/gallery/${image.id}/edit` : '/landing/gallery/new';
+%>
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <p class="text-uppercase text-primary fw-bold small mb-1" data-bn="গ্যালারি কনটেন্ট" data-en="Gallery content">গ্যালারি কনটেন্ট</p>
+    <h3 class="mb-1" data-bn="<%= isEdit ? 'ছবি সম্পাদনা' : 'নতুন ছবি যোগ করুন' %>" data-en="<%= isEdit ? 'Edit photo' : 'Add a new photo' %>"><%= isEdit ? 'ছবি সম্পাদনা' : 'নতুন ছবি যোগ করুন' %></h3>
+    <p class="text-muted mb-0" data-bn="ছবিটি সংরক্ষণের পর সরাসরি ওয়েবসাইটে প্রকাশ হবে" data-en="The photo will be published immediately after saving">ছবিটি সংরক্ষণের পর সরাসরি ওয়েবসাইটে প্রকাশ হবে</p>
+  </div>
+  <a href="/landing/gallery" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i><span data-bn="গ্যালারিতে ফিরুন" data-en="Back to gallery">গ্যালারিতে ফিরুন</span></a>
+</div>
+
+<form method="post" action="<%= action %>?_csrf=<%= encodeURIComponent(csrfToken) %>" enctype="multipart/form-data">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card shadow-sm h-100">
+        <div class="card-header" data-bn="ছবির তথ্য" data-en="Photo information">ছবির তথ্য</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label required" data-bn="বাংলা শিরোনাম" data-en="Bengali title">বাংলা শিরোনাম</label>
+              <input type="text" name="title_bn" class="form-control" value="<%= isEdit ? image.title_bn : '' %>" data-placeholder-bn="যেমন: মসজিদের সম্মুখ" data-placeholder-en="Example: Mosque exterior" placeholder="যেমন: মসজিদের সম্মুখ" required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label required" data-bn="ইংরেজি শিরোনাম" data-en="English title">ইংরেজি শিরোনাম</label>
+              <input type="text" name="title_en" class="form-control" value="<%= isEdit ? image.title_en : '' %>" placeholder="Example: Mosque Exterior" required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label required" data-bn="বিভাগ" data-en="Category">বিভাগ</label>
+              <select name="category" class="form-select" required>
+                <option value="Building" <%= isEdit && image.category === 'Building' ? 'selected' : '' %> data-bn="ভবন" data-en="Building">ভবন</option>
+                <option value="Prayer" <%= isEdit && image.category === 'Prayer' ? 'selected' : '' %> data-bn="নামাজ" data-en="Prayer">নামাজ</option>
+                <option value="Events" <%= isEdit && image.category === 'Events' ? 'selected' : '' %> data-bn="অনুষ্ঠান" data-en="Events">অনুষ্ঠান</option>
+                <option value="Education" <%= isEdit && image.category === 'Education' ? 'selected' : '' %> data-bn="শিক্ষা" data-en="Education">শিক্ষা</option>
+                <option value="Charity" <%= isEdit && image.category === 'Charity' ? 'selected' : '' %> data-bn="দান ও সেবা" data-en="Charity">দান ও সেবা</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label required" data-bn="প্রদর্শন ক্রম" data-en="Display order">প্রদর্শন ক্রম</label>
+              <input type="number" min="0" name="sort_order" class="form-control" value="<%= isEdit ? image.sort_order : '0' %>" required />
+              <small class="text-muted" data-bn="ছোট সংখ্যা আগে দেখাবে; পরে তালিকা থেকেও ক্রম পরিবর্তন করা যাবে।" data-en="Lower numbers appear first; order can also be changed from the list.">ছোট সংখ্যা আগে দেখাবে; পরে তালিকা থেকেও ক্রম পরিবর্তন করা যাবে।</small>
+            </div>
+
+            <div class="col-12"><hr class="my-1" /></div>
+            <div class="col-md-6">
+              <label class="form-label <%= isEdit ? '' : 'required' %>" data-bn="কম্পিউটার থেকে ছবি" data-en="Upload from device">কম্পিউটার থেকে ছবি</label>
+              <input type="file" name="image" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp" data-gallery-file />
+              <small class="text-muted d-block mt-1" data-bn="JPG, PNG, GIF অথবা WebP · সর্বোচ্চ ৪ MB · প্রস্তাবিত ১৬:১০ অনুপাত" data-en="JPG, PNG, GIF, or WebP · Maximum 4 MB · Recommended 16:10 ratio">JPG, PNG, GIF অথবা WebP · সর্বোচ্চ ৪ MB · প্রস্তাবিত ১৬:১০ অনুপাত</small>
+              <span class="small fw-semibold text-primary d-none mt-2" data-gallery-filename></span>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" data-bn="অথবা ছবির URL" data-en="Or image URL">অথবা ছবির URL</label>
+              <input type="url" name="image_path" class="form-control" value="<%= isEdit ? image.image_path : '' %>" placeholder="https://example.com/image.jpg" data-gallery-url />
+              <small class="text-muted d-block mt-1" data-bn="নিজস্ব আপলোড বেশি নির্ভরযোগ্য; বাহ্যিক লিংক পরে বন্ধ হয়ে যেতে পারে।" data-en="Local uploads are more reliable; external links may stop working.">নিজস্ব আপলোড বেশি নির্ভরযোগ্য; বাহ্যিক লিংক পরে বন্ধ হয়ে যেতে পারে।</small>
+              <span class="small text-warning d-none mt-2" data-gallery-priority data-bn="নির্বাচিত ফাইলটি URL-এর ছবিকে প্রতিস্থাপন করবে।" data-en="The selected file will replace the URL image.">নির্বাচিত ফাইলটি URL-এর ছবিকে প্রতিস্থাপন করবে।</span>
+            </div>
+
+            <div class="col-12">
+              <div class="form-check form-switch border rounded p-3 ps-5">
+                <input class="form-check-input" type="checkbox" name="is_active" id="isActiveSwitch" value="true" <%= !isEdit || image.is_active ? 'checked' : '' %>>
+                <label class="form-check-label fw-semibold" for="isActiveSwitch" data-bn="ওয়েবসাইটে ছবিটি দেখান" data-en="Show this photo on the website">ওয়েবসাইটে ছবিটি দেখান</label>
+                <small class="text-muted d-block" data-bn="বন্ধ করলে ছবিটি সংরক্ষিত থাকবে কিন্তু দর্শকদের দেখানো হবে না।" data-en="When disabled, the photo remains saved but is hidden from visitors.">বন্ধ করলে ছবিটি সংরক্ষিত থাকবে কিন্তু দর্শকদের দেখানো হবে না।</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card shadow-sm h-100">
+        <div class="card-header" data-bn="ছবির প্রিভিউ" data-en="Photo preview">ছবির প্রিভিউ</div>
+        <div class="card-body d-flex flex-column">
+          <div class="ratio rounded overflow-hidden border bg-light <%= isEdit && image.image_path ? '' : 'd-none' %>" style="--bs-aspect-ratio:62.5%" data-gallery-preview-wrap>
+            <img src="<%= isEdit && image.image_path ? image.image_path : '' %>" alt="Gallery preview" class="w-100 h-100 object-fit-cover" data-gallery-preview />
+          </div>
+          <div class="ratio rounded border bg-light d-flex align-items-center justify-content-center <%= isEdit && image.image_path ? 'd-none' : '' %>" style="--bs-aspect-ratio:62.5%" data-gallery-empty>
+            <div class="text-center text-muted">
+              <span class="material-symbols-outlined fs-1">add_photo_alternate</span>
+              <p class="small mb-0" data-bn="একটি ফাইল বা URL নির্বাচন করলে এখানে দেখা যাবে" data-en="Choose a file or URL to preview it here">একটি ফাইল বা URL নির্বাচন করলে এখানে দেখা যাবে</p>
+            </div>
+          </div>
+          <div class="mt-auto pt-4 d-flex gap-2">
+            <a href="/landing/gallery" class="btn btn-outline-secondary flex-fill" data-bn="বাতিল" data-en="Cancel">বাতিল</a>
+            <button class="btn btn-primary flex-fill" type="submit"><i class="bi bi-check-lg me-1"></i><span data-bn="সংরক্ষণ ও প্রকাশ" data-en="Save & publish">সংরক্ষণ ও প্রকাশ</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const fileInput = document.querySelector('[data-gallery-file]');
+  const urlInput = document.querySelector('[data-gallery-url]');
+  const preview = document.querySelector('[data-gallery-preview]');
+  const previewWrap = document.querySelector('[data-gallery-preview-wrap]');
+  const empty = document.querySelector('[data-gallery-empty]');
+  const filename = document.querySelector('[data-gallery-filename]');
+  const priority = document.querySelector('[data-gallery-priority]');
+  let objectUrl = '';
+
+  function showPreview(src, name) {
+    if (!preview || !previewWrap || !src) return;
+    preview.src = src;
+    previewWrap.classList.remove('d-none');
+    if (empty) empty.classList.add('d-none');
+    if (filename) {
+      filename.textContent = name || '';
+      filename.classList.toggle('d-none', !name);
+    }
+  }
+
+  if (fileInput) fileInput.addEventListener('change', function () {
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      fileInput.setCustomValidity('Image must be 4 MB or smaller.');
+      fileInput.reportValidity();
+      fileInput.value = '';
+      return;
+    }
+    fileInput.setCustomValidity('');
+    objectUrl = URL.createObjectURL(file);
+    showPreview(objectUrl, file.name);
+    if (priority) priority.classList.toggle('d-none', !urlInput || !urlInput.value);
+  });
+
+  if (urlInput) urlInput.addEventListener('input', function () {
+    const hasFile = Boolean(fileInput && fileInput.files && fileInput.files.length);
+    if (priority) priority.classList.toggle('d-none', !hasFile || !urlInput.value);
+    if (!hasFile && urlInput.value) showPreview(urlInput.value, '');
+  });
+});
+</script>

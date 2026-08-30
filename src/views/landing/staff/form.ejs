@@ -1,0 +1,90 @@
+<%
+  const isEdit = member !== null;
+  const action = isEdit ? `/landing/staff/${member.id}/edit` : '/landing/staff/new';
+%>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><%= title %></h3>
+  <a href="/landing/staff" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> ফিরে যান</a>
+</div>
+
+<div class="card shadow-sm"><div class="card-body">
+  <form method="post" action="<%= action %>?_csrf=<%= encodeURIComponent(csrfToken) %>" enctype="multipart/form-data" class="row g-3">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+    <div class="col-md-6">
+      <label class="form-label required">নাম (বাংলা)</label>
+      <input type="text" name="name_bn" class="form-control" value="<%= isEdit ? member.name_bn : '' %>" required />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label required">নাম (ইংরেজি)</label>
+      <input type="text" name="name_en" class="form-control" value="<%= isEdit ? member.name_en : '' %>" required />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label required">পদবী (বাংলা)</label>
+      <input type="text" name="position_bn" class="form-control" value="<%= isEdit ? member.position_bn : '' %>" required />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label required">পদবী (ইংরেজি)</label>
+      <input type="text" name="position_en" class="form-control" value="<%= isEdit ? member.position_en : '' %>" required />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">সংক্ষিপ্ত জীবনবৃত্তান্ত (বাংলা)</label>
+      <textarea name="bio_bn" class="form-control" rows="3"><%= isEdit ? member.bio_bn : '' %></textarea>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">সংক্ষিপ্ত জীবনবৃত্তান্ত (ইংরেজি)</label>
+      <textarea name="bio_en" class="form-control" rows="3"><%= isEdit ? member.bio_en : '' %></textarea>
+    </div>
+
+    <div class="col-md-4 col-sm-6">
+      <label class="form-label">ইমেইল</label>
+      <input type="email" name="email" class="form-control" value="<%= isEdit ? member.email : '' %>" />
+    </div>
+
+    <div class="col-md-4 col-sm-6">
+      <label class="form-label">ফোন নম্বর</label>
+      <input type="text" name="phone" class="form-control" value="<%= isEdit ? member.phone : '' %>" />
+    </div>
+
+    <div class="col-md-4 col-sm-6">
+      <label class="form-label required">ক্রমিক নম্বর (শর্ট অর্ডার)</label>
+      <input type="number" name="sort_order" class="form-control" value="<%= isEdit ? member.sort_order : '0' %>" required />
+    </div>
+
+    <div class="col-md-4"><label class="form-label">স্টাফের ধরন</label><select name="staff_type" class="form-select"><option value="imam" <%= isEdit&&member.staff_type==='imam'?'selected':'' %>>ইমাম / খতিব</option><option value="muezzin" <%= isEdit&&member.staff_type==='muezzin'?'selected':'' %>>মুয়াজ্জিন</option><option value="teacher" <%= isEdit&&member.staff_type==='teacher'?'selected':'' %>>শিক্ষক</option><option value="staff" <%= !isEdit||member.staff_type==='staff'?'selected':'' %>>অন্যান্য স্টাফ</option></select></div>
+    <div class="col-md-4"><label class="form-label">যোগদানের তারিখ</label><input type="date" name="joining_date" class="form-control" value="<%= isEdit&&member.joining_date?String(member.joining_date).slice(0,10):'' %>"/></div>
+    <div class="col-md-3"><label class="form-label">মূল মাসিক বেতন</label><input type="number" min="0" step="0.01" name="basic_salary" class="form-control" value="<%= isEdit?member.basic_salary||0:0 %>"/></div>
+    <div class="col-md-3"><label class="form-label">মাসিক ভাতা/সম্মানী</label><input type="number" min="0" step="0.01" name="monthly_allowance" class="form-control" value="<%= isEdit?member.monthly_allowance||0:0 %>"/></div>
+    <div class="col-md-3"><label class="form-label">চাকরির অবস্থা</label><select name="employment_status" class="form-select"><option value="active" <%= !isEdit||member.employment_status==='active'?'selected':'' %>>কর্মরত</option><option value="leave" <%= isEdit&&member.employment_status==='leave'?'selected':'' %>>ছুটিতে</option><option value="left" <%= isEdit&&member.employment_status==='left'?'selected':'' %>>চাকরি শেষ</option></select></div>
+    <div class="col-12"><label class="form-label">ঠিকানা</label><input name="address" class="form-control" value="<%= isEdit?member.address||'':'' %>"/></div>
+
+    <div class="col-md-6">
+      <label class="form-label">ছবি আপলোড</label>
+      <input type="file" name="photo" class="form-control" accept="image/*" />
+      <% if (isEdit && member.photo) { %>
+      <div class="mt-2">
+        <label class="small text-muted d-block">বর্তমান ছবি:</label>
+        <img src="<%= member.photo %>" class="border rounded" style="max-height:100px; max-width: 100px; object-fit: cover;" />
+      </div>
+      <% } %>
+    </div>
+
+    <div class="col-12">
+      <div class="form-check form-switch mt-2">
+        <input class="form-check-input" type="checkbox" name="is_active" id="isActiveSwitch" value="true" <%= !isEdit || member.is_active ? 'checked' : '' %>>
+        <label class="form-check-label font-weight-bold" for="isActiveSwitch">সক্রিয় রাখুন (ল্যান্ডিং পেজে প্রদর্শন করার জন্য)</label>
+      </div>
+      <div class="form-check form-switch mt-2"><input class="form-check-input" type="checkbox" name="show_on_website" id="showOnWebsite" value="true" <%= !isEdit||member.show_on_website?'checked':'' %>><label class="form-check-label" for="showOnWebsite">পাবলিক ওয়েবসাইটে দেখান</label></div>
+    </div>
+
+    <div class="col-12 mt-4">
+      <button class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> সংরক্ষণ করুন</button>
+    </div>
+  </form>
+</div></div>

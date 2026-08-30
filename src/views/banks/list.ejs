@@ -1,4 +1,4 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
+﻿<div class="d-flex justify-content-between align-items-center mb-3">
   <h3 class="mb-0">ব্যাংক লেনদেন</h3>
   <% if (currentUser.role !== 'viewer') { %>
   <div>
@@ -13,17 +13,17 @@
     <thead><tr><th>ক্রমিক</th><th>ব্যাংক</th><th>ধরন</th><th>মন্তব্য</th><th>জমা</th><th>উত্তোলন</th><th>তারিখ</th><th class="no-print">অ্যাকশন</th></tr></thead>
     <tbody>
       <% rows.forEach(function(t,i){ %>
-      <tr>
+      <tr class="<%= t.status==='cancelled'?'text-muted':'' %>">
         <td><%= bn.toBnDigits(i+1) %></td>
         <td><%= t.bank_name||'' %></td>
-        <td><span class="badge bg-<%= t.type==='deposit'?'success':'danger' %>"><%= t.type==='deposit'?'জমা':'উত্তোলন' %></span></td>
-        <td><%= t.remarks||'' %></td>
-        <td><%= t.type==='deposit'? bn.money(t.amount) : '' %></td>
-        <td><%= t.type==='withdraw'? bn.money(t.amount) : '' %></td>
+        <td><span class="badge bg-<%= t.status==='cancelled'?'secondary':t.type==='deposit'?'success':'danger' %>"><%= t.status==='cancelled'?'বাতিল':t.type==='deposit'?'জমা':'উত্তোলন' %></span></td>
+        <td><%= t.status==='cancelled'?(t.cancellation_reason||'বাতিল'):t.remarks||'' %></td>
+        <td class="<%= t.status==='cancelled'?'text-decoration-line-through':'' %>"><%= t.type==='deposit'? bn.money(t.amount) : '' %></td>
+        <td class="<%= t.status==='cancelled'?'text-decoration-line-through':'' %>"><%= t.type==='withdraw'? bn.money(t.amount) : '' %></td>
         <td><%= bn.date(t.date) %></td>
         <td class="no-print">
-          <% if (currentUser.role !== 'viewer') { %>
-          <form method="post" action="/banks/<%= t.id %>/delete" class="d-inline confirm-delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+          <% if (currentUser.role === 'admin' && t.status==='posted') { %>
+          <form method="post" action="/banks/<%= t.id %>/cancel" class="d-flex gap-1"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><input name="cancellation_reason" class="form-control form-control-sm" placeholder="বাতিলের কারণ" required/><button class="btn btn-sm btn-outline-danger" onclick="return confirm('লেনদেনটি বাতিল করবেন?')"><i class="bi bi-x-circle"></i></button></form>
           <% } %>
         </td>
       </tr>

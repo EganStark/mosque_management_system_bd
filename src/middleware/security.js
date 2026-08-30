@@ -36,6 +36,11 @@ const {
 const loginLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 minutes
   max: 10,
+  // Successful logins are legitimate traffic and should not lock an office/NAT IP.
+  // Failed redirects still count, preserving brute-force protection.
+  skipSuccessfulRequests: true,
+  requestWasSuccessful: (_req, res) =>
+    res.statusCode < 400 && res.getHeader('location') !== '/login',
   standardHeaders: true,
   legacyHeaders: false,
   message: 'অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।',

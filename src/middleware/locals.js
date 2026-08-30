@@ -3,6 +3,9 @@
 const bn = require('../utils/bn');
 const settingsService = require('../services/settings');
 const { generateCsrfToken } = require('./security');
+const notificationsService = require('../services/notifications');
+const securityService = require('../services/security');
+const approvalsService = require('../services/approvals');
 
 let cachedSettings = null;
 let cachedAt = 0;
@@ -29,6 +32,7 @@ async function locals(req, res, next) {
   };
   res.locals.bn = bn;
   res.locals.activePath = req.path;
+  res.locals.landingPageUrl = process.env.LANDING_PAGE_URL || process.env.LANDING_PAGE_ORIGIN || 'http://localhost:8080';
   try {
     res.locals.csrfToken = generateCsrfToken(req, res);
   } catch (e) {
@@ -38,6 +42,26 @@ async function locals(req, res, next) {
     res.locals.company = await getSettings();
   } catch (e) {
     res.locals.company = { company_name: 'বায়তুর রহমান জামে মসজিদ' };
+  }
+  res.locals.navNotifications = { items: [], unreadCount: 0, totalCount: 0 };
+  res.locals.navCapabilities = {};
+  res.locals.navApprovals = { total: 0 };
+  if (res.locals.currentUser) {
+    try {
+      const permissionKeys = securityService.PERMISSIONS.map((item) => item.key);
+      const [notifications, permissionValues] = await Promise.all([
+        notificationsService.list(res.locals.currentUser, 4),
+        Promise.all(permissionKeys.map((permission) =>
+          securityService.allowed(res.locals.currentUser.role, permission))),
+      ]);
+      res.locals.navNotifications = notifications;
+      res.locals.navCapabilities = Object.fromEntries(
+        permissionKeys.map((permission, index) => [permission, permissionValues[index]]),
+      );
+      if (res.locals.navCapabilities['system.manage']) {
+        res.locals.navApprovals = await approvalsService.summary();
+      }
+    } catch (_) { /* Navbar must not block page rendering. */ }
   }
   next();
 }

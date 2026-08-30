@@ -7,6 +7,14 @@ src/public/uploads/*
 npm-debug.log*
 coverage/
 *.log
+landing-page/.vercel/
+storage/backups/*
+!storage/backups/.gitkeep
+storage/documents/*
+!storage/documents/.gitkeep
+
+# Local design/reference exports; production screenshots belong in docs/screenshots.
+stitch_markdown_instruction_processor/
 
 # Local-only analysis of the reference site (contains third-party credentials/PII)
 SITE_FUNCTIONALITY_REPORT.md

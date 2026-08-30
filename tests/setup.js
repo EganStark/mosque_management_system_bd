@@ -10,8 +10,10 @@ process.env.ADMIN_USERNAME = 'admin';
 process.env.ADMIN_PASSWORD = 'Admin@2026';
 
 const db = require('../src/config/db');
+const { ensureTestDatabase } = require('../scripts/ensure-test-db');
 
 async function migrateAndSeed() {
+  await ensureTestDatabase();
   await db.migrate.latest();
   await db.seed.run();
 }

@@ -35,15 +35,62 @@ async function create({ name, username, email, password, role, is_active = true 
   return publicFields(row);
 }
 
-async function update(id, { name, username, email, role, is_active, password }) {
-  const patch = { name, username, email, role, is_active, updated_at: db.fn.now() };
-  if (password) patch.password_hash = await bcrypt.hash(password, SALT_ROUNDS);
-  await db('users').where({ id }).update(patch);
-  return findById(id);
+async function update(id, { name, username, email, role, password }, actorId) {
+  return db.transaction(async (trx) => {
+    const user = await trx('users').where({ id }).forUpdate().first();
+    if (!user) throw new Error('User not found');
+
+    if (user.role === 'admin' && role !== 'admin' && user.is_active) {
+      if (Number(user.id) === Number(actorId)) {
+        throw new Error('You cannot remove your own administrator role');
+      }
+      const [{ count }] = await trx('users')
+        .where({ role: 'admin', is_active: true })
+        .count('* as count');
+      if (Number(count) <= 1) throw new Error('At least one active administrator is required');
+    }
+
+    const patch = { name, username, email, role, updated_at: trx.fn.now() };
+    if (password) patch.password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+    await trx('users').where({ id }).update(patch);
+    return publicFields(await trx('users').where({ id }).first());
+  });
 }
 
-async function remove(id) {
-  return db('users').where({ id }).del();
+async function setActive(id, isActive, actorId) {
+  return db.transaction(async (trx) => {
+    const user = await trx('users').where({ id }).forUpdate().first();
+    if (!user) throw new Error('User not found');
+    if (Boolean(user.is_active) === Boolean(isActive)) return publicFields(user);
+
+    if (!isActive) {
+      if (Number(user.id) === Number(actorId)) {
+        throw new Error('You cannot deactivate your own account');
+      }
+      if (user.role === 'admin') {
+        const [{ count }] = await trx('users')
+          .where({ role: 'admin', is_active: true })
+          .count('* as count');
+        if (Number(count) <= 1) throw new Error('At least one active administrator is required');
+      }
+    }
+
+    await trx('users').where({ id }).update({
+      is_active: Boolean(isActive),
+      updated_at: trx.fn.now(),
+    });
+    return publicFields(await trx('users').where({ id }).first());
+  });
 }
 
-module.exports = { ROLES, publicFields, findByUsername, findById, list, verifyPassword, create, update, remove };
+module.exports = {
+  ROLES,
+  publicFields,
+  findByUsername,
+  findById,
+  list,
+  verifyPassword,
+  create,
+  update,
+  setActive,
+};

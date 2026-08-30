@@ -1,0 +1,54 @@
+<div class="mb-4"><p class="text-uppercase text-primary fw-bold small mb-1">Data protection</p><h3 class="mb-1">ব্যাকআপ ও পুনরুদ্ধার</h3><p class="text-muted mb-0">মসজিদ ব্যবস্থাপনা সিস্টেমের বহনযোগ্য ও যাচাইকৃত ডেটা সুরক্ষা</p></div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4"><div class="card"><div class="card-body"><p class="small text-muted mb-1">ব্যাকআপ টেবিল</p><h4><%= bn.num(Object.keys(stats.tables).length) %></h4></div></div><div class="card"><div class="card-body"><p class="small text-muted mb-1">মোট রেকর্ড</p><h4><%= bn.num(stats.totalRows) %></h4></div></div><div class="card"><div class="card-body"><p class="small text-muted mb-1">রিকভারি কপি</p><h4><%= bn.num(stats.recoveryFiles.length) %></h4></div></div></div>
+<div class="row g-4"><div class="col-lg-6"><div class="card h-100"><div class="card-header">নতুন ব্যাকআপ</div><div class="card-body"><div class="backup-illustration mb-4"><i class="bi bi-cloud-arrow-down"></i></div><h5>সম্পূর্ণ ডেটাবেস ডাউনলোড</h5><p class="text-muted">সদস্য, আর্থিক হিসাব, বিল, কমিটি, সম্পদ, ওয়েবসাইট কনটেন্ট, অনুমতি ও অডিট লগসহ একটি যাচাইকৃত JSON ফাইল তৈরি হবে।</p><a href="/backups/download" class="btn btn-primary"><i class="bi bi-download me-1"></i> ব্যাকআপ ডাউনলোড করুন</a></div></div></div>
+<div class="col-lg-6"><div class="card h-100"><div class="card-header">ব্যাকআপ যাচাই</div><div class="card-body"><p class="text-muted">কোনো পরিবর্তন না করে ফাইলের ফরম্যাট, চেকসাম এবং প্রয়োজনীয় টেবিল যাচাই করুন।</p><form method="post" action="/backups/validate?_csrf=<%= encodeURIComponent(csrfToken) %>" enctype="multipart/form-data"><input type="hidden" name="_csrf" value="<%= csrfToken %>"/><input type="file" name="backup_file" accept="application/json,.json" class="form-control mb-3" required/><button class="btn btn-outline-primary">শুধু যাচাই করুন</button></form></div></div></div></div>
+<div class="card border-danger mt-4"><div class="card-header text-danger">ডেটাবেস পুনরুদ্ধার</div><div class="card-body"><div class="alert alert-danger"><strong>সতর্কতা:</strong> এটি বর্তমান অ্যাপ ডেটা নির্বাচিত ব্যাকআপ দিয়ে প্রতিস্থাপন করবে। কাজ শুরুর আগে সিস্টেম স্বয়ংক্রিয়ভাবে বর্তমান ডেটার একটি রিকভারি কপি সংরক্ষণ করবে।</div><form method="post" action="/backups/restore?_csrf=<%= encodeURIComponent(csrfToken) %>" enctype="multipart/form-data" class="row g-3"><input type="hidden" name="_csrf" value="<%= csrfToken %>"/><div class="col-lg-6"><label class="form-label required">ব্যাকআপ ফাইল</label><input type="file" name="backup_file" accept="application/json,.json" class="form-control" required/></div><div class="col-lg-3"><label class="form-label required">নিশ্চিত করতে RESTORE লিখুন</label><input name="confirmation" autocomplete="off" class="form-control" required/></div><div class="col-lg-3 d-flex align-items-end"><button class="btn btn-danger w-100" onclick="return confirm('বর্তমান ডেটা প্রতিস্থাপন করতে নিশ্চিত?')">পুনরুদ্ধার করুন</button></div></form></div></div>
+<% if(stats.recoveryFiles.length){ %><div class="card mt-4"><div class="card-header">সাম্প্রতিক স্বয়ংক্রিয় রিকভারি কপি</div><div class="card-body"><ul class="list-group list-group-flush"><% stats.recoveryFiles.forEach(function(name){ %><li class="list-group-item"><i class="bi bi-shield-check me-2 text-success"></i><%= name %></li><% }) %></ul></div></div><% } %>
+
+<div class="card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span data-bn="আপলোড স্টোরেজ রক্ষণাবেক্ষণ" data-en="Upload storage maintenance">আপলোড স্টোরেজ রক্ষণাবেক্ষণ</span>
+    <span class="badge bg-secondary"><%= bn.num(storage.files) %> <span data-bn="ফাইল" data-en="files">ফাইল</span></span>
+  </div>
+  <div class="card-body">
+    <div class="row g-3 mb-4">
+      <div class="col-md-4"><div class="border rounded p-3"><small class="text-muted" data-bn="মোট স্টোরেজ" data-en="Total storage">মোট স্টোরেজ</small><strong class="d-block mt-1"><%= (storage.totalBytes / 1024 / 1024).toFixed(2) %> MB</strong></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><small class="text-muted" data-bn="ব্যবহৃত ফাইল" data-en="Referenced files">ব্যবহৃত ফাইল</small><strong class="d-block mt-1 text-success"><%= bn.num(storage.referenced) %></strong></div></div>
+      <div class="col-md-4"><div class="border rounded p-3"><small class="text-muted" data-bn="পরিষ্কারযোগ্য ফাইল" data-en="Cleanable files">পরিষ্কারযোগ্য ফাইল</small><strong class="d-block mt-1 text-warning"><%= bn.num(storage.orphaned.length) %> · <%= (storage.orphanBytes / 1024 / 1024).toFixed(2) %> MB</strong></div></div>
+    </div>
+    <p class="text-muted small" data-bn="শুধু এক ঘণ্টার বেশি পুরোনো এবং কোনো পরিচিত ডেটাবেস রেকর্ডে ব্যবহৃত নয়—এমন ফাইল এখানে দেখানো হয়।" data-en="Only files older than one hour and unused by every known database record are shown here.">শুধু এক ঘণ্টার বেশি পুরোনো এবং কোনো পরিচিত ডেটাবেস রেকর্ডে ব্যবহৃত নয়—এমন ফাইল এখানে দেখানো হয়।</p>
+    <% if (storage.orphaned.length) { %>
+      <form method="post" action="/backups/uploads/cleanup" data-confirm="নির্বাচিত অনাথ ফাইল স্থায়ীভাবে মুছে ফেলবেন?">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <div class="table-responsive mb-3"><table class="table table-sm align-middle">
+          <thead><tr><th><input type="checkbox" data-storage-select-all /></th><th data-bn="ফাইল" data-en="File">ফাইল</th><th data-bn="আকার" data-en="Size">আকার</th><th data-bn="সর্বশেষ পরিবর্তন" data-en="Last modified">সর্বশেষ পরিবর্তন</th></tr></thead>
+          <tbody><% storage.orphaned.forEach(function(file){ %><tr><td><input type="checkbox" name="selected" value="<%= file.name %>" data-storage-item /></td><td class="text-break"><code><%= file.name %></code></td><td><%= (file.size / 1024).toFixed(1) %> KB</td><td><%= bn.date(file.modifiedAt) %></td></tr><% }) %></tbody>
+        </table></div>
+        <div class="row g-2 align-items-end">
+          <div class="col-md-4"><label class="form-label required" data-bn="নিশ্চিত করতে DELETE লিখুন" data-en="Type DELETE to confirm">নিশ্চিত করতে DELETE লিখুন</label><input name="confirmation" class="form-control" autocomplete="off" required /></div>
+          <div class="col-md-4"><button class="btn btn-outline-danger" type="submit" data-storage-clean disabled><i class="bi bi-trash me-1"></i><span data-bn="নির্বাচিত ফাইল পরিষ্কার করুন" data-en="Delete selected files">নির্বাচিত ফাইল পরিষ্কার করুন</span></button></div>
+        </div>
+      </form>
+    <% } else { %>
+      <div class="alert alert-success mb-0" data-bn="কোনো নিরাপদ পরিষ্কারযোগ্য আপলোড পাওয়া যায়নি।" data-en="No safely cleanable uploads were found.">কোনো নিরাপদ পরিষ্কারযোগ্য আপলোড পাওয়া যায়নি।</div>
+    <% } %>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const all = document.querySelector('[data-storage-select-all]');
+  const items = Array.from(document.querySelectorAll('[data-storage-item]'));
+  const clean = document.querySelector('[data-storage-clean]');
+  function refresh() {
+    const selected = items.filter((item) => item.checked).length;
+    if (clean) clean.disabled = selected === 0;
+    if (all) {
+      all.checked = items.length > 0 && selected === items.length;
+      all.indeterminate = selected > 0 && selected < items.length;
+    }
+  }
+  if (all) all.addEventListener('change', function () { items.forEach((item) => { item.checked = all.checked; }); refresh(); });
+  items.forEach((item) => item.addEventListener('change', refresh));
+  refresh();
+});
+</script>

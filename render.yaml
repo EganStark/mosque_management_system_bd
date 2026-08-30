@@ -1,0 +1,52 @@
+services:
+  - type: web
+    name: mosque-management-admin
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: npm run migrate && npm run seed && npm start
+    healthCheckPath: /healthz
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "true"
+      - key: STORAGE_PROVIDER
+        value: supabase
+      - key: PORT
+        value: "10000"
+      - key: DATABASE_URL
+        sync: false
+      - key: LANDING_PAGE_ORIGIN
+        sync: false
+      - key: LANDING_PAGE_URL
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: CSRF_SECRET
+        generateValue: true
+      - key: SUBMISSION_HASH_SECRET
+        generateValue: true
+      - key: ADMIN_NAME
+        value: Administrator
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_PUBLIC_BUCKET
+        value: public-media
+      - key: SUPABASE_PRIVATE_BUCKET
+        value: private-documents
+      - key: SUPABASE_BACKUP_BUCKET
+        value: database-backups
+      - key: BACKUP_RETENTION_DAYS
+        value: "30"
+      - key: SMS_GATEWAY_ENABLED
+        value: "false"

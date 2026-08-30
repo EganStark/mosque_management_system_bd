@@ -29,11 +29,13 @@ router.post(
         req.flash('error', 'ভুল ইউজারনেম বা পাসওয়ার্ড।');
         return res.redirect('/login');
       }
-      req.session.user = { id: user.id, name: user.name, username: user.username, role: user.role };
       const dest = req.session.returnTo || '/dashboard';
-      delete req.session.returnTo;
-      req.flash('success', 'স্বাগতম, ' + user.name + '!');
-      res.redirect(dest);
+      req.session.regenerate((sessionErr) => {
+        if (sessionErr) return next(sessionErr);
+        req.session.user = { id: user.id, name: user.name, username: user.username, role: user.role };
+        req.flash('success', 'স্বাগতম, ' + user.name + '!');
+        return res.redirect(dest);
+      });
     } catch (err) {
       next(err);
     }

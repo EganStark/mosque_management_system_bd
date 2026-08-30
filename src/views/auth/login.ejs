@@ -1,22 +1,134 @@
-<div class="auth-wrap">
-  <div class="auth-card">
-    <div class="text-center mb-4">
-      <i class="bi bi-moon-stars-fill auth-logo"></i>
-      <h1 class="h4 mt-2 mb-0"><%= company && company.company_name ? company.company_name : 'বায়তুর রহমান জামে মসজিদ' %></h1>
-      <p class="text-muted small">প্রশাসনিক প্যানেল</p>
+<style>
+  .mosque-pattern {
+      background-color: #fafaf5;
+      background-image: radial-gradient(#006b2c 0.5px, transparent 0.5px), radial-gradient(#006b2c 0.5px, #fafaf5 0.5px);
+      background-size: 40px 40px;
+      background-position: 0 0, 20px 20px;
+      opacity: 0.05;
+  }
+</style>
+
+<!-- Atmospheric Background Pattern -->
+<div class="absolute inset-0 mosque-pattern pointer-events-none"></div>
+<div class="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[120px]"></div>
+
+<!-- Login Container -->
+<main class="relative z-10 w-full max-w-[440px] px-margin-mobile mx-auto flex flex-col justify-center min-h-screen">
+  <!-- Brand Identity -->
+  <div class="text-center mb-stack-lg">
+    <div class="inline-flex items-center justify-center w-20 h-20 bg-primary rounded-xl mb-stack-md shadow-lg shadow-primary/20">
+      <span class="material-symbols-outlined text-white text-[48px]">mosque</span>
     </div>
-    <%- include('../partials/flash') %>
-    <form method="post" action="/login">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-      <div class="mb-3">
-        <label class="form-label">ইউজারনেম</label>
-        <input type="text" name="username" class="form-control form-control-lg" autofocus required />
-      </div>
-      <div class="mb-3">
-        <label class="form-label">পাসওয়ার্ড</label>
-        <input type="password" name="password" class="form-control form-control-lg" required />
-      </div>
-      <button type="submit" class="btn btn-primary btn-lg w-100">লগইন</button>
-    </form>
+    <h1 class="font-headline-md text-headline-md text-primary mb-1">
+      <%= company && company.company_name ? company.company_name : 'বায়তুর রহমান জামে মসজিদ' %>
+    </h1>
+    <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-widest">প্রশাসনিক প্যানেল (Management System)</p>
   </div>
-</div>
+
+  <!-- Login Card -->
+  <div class="bg-surface-container-lowest rounded-xl border border-border-subtle shadow-[0_8px_24px_rgba(15,23,42,0.06)] p-8 md:p-10">
+    <div class="mb-stack-lg">
+      <h2 class="font-headline-md text-headline-md text-on-surface mb-2">এডমিন লগইন</h2>
+      <p class="text-on-surface-variant text-label-md">ড্যাশবোর্ডে প্রবেশ করতে আপনার ইউজারনেম ও পাসওয়ার্ড প্রদান করুন।</p>
+    </div>
+
+    <!-- Flash Messages -->
+    <%- include('../partials/flash') %>
+
+    <form class="space-y-5" id="loginForm" method="post" action="/login">
+      <!-- CSRF Token -->
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+      <!-- Username / Email Input -->
+      <div class="space-y-2">
+        <label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-2" for="username">
+          <span class="material-symbols-outlined text-[18px]">alternate_email</span>
+          ইউজারনেম / ইমেইল (Username)
+        </label>
+        <input class="w-full h-12 px-4 rounded-lg border border-border-subtle bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-body-md"
+               id="username" name="username" placeholder="admin" required autofocus type="text"/>
+      </div>
+
+      <!-- Password Input -->
+      <div class="space-y-2">
+        <div class="flex justify-between items-center">
+          <label class="font-label-md text-label-md text-on-surface-variant flex items-center gap-2" for="password">
+            <span class="material-symbols-outlined text-[18px]">lock</span>
+            পাসওয়ার্ড (Password)
+          </label>
+        </div>
+        <div class="relative">
+          <input class="w-full h-12 px-4 rounded-lg border border-border-subtle bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-body-md"
+                 id="password" name="password" placeholder="••••••••" required type="password"/>
+          <button class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60 hover:text-primary transition-colors"
+                  id="togglePassword" type="button">
+            <span class="material-symbols-outlined text-[20px]">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button class="group w-full h-12 bg-primary hover:bg-forest-deep text-white font-button text-button rounded-xl shadow-md shadow-primary/10 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
+              id="submitBtn" type="submit">
+        লগইন করুন (Login)
+        <span class="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1">login</span>
+      </button>
+    </form>
+
+    <!-- Security Note -->
+    <div class="mt-8 pt-6 border-t border-border-subtle flex items-start gap-3">
+      <span class="material-symbols-outlined text-error text-[20px]">gpp_maybe</span>
+      <p class="text-[12px] text-on-surface-variant leading-relaxed">
+        অনুমোদিত কর্মকর্তা এবং পরিচালনা কমিটির জন্য সংরক্ষিত। নিরাপত্তা রক্ষার্থে সকল কার্যকলাপ মনিটর করা হচ্ছে।
+      </p>
+    </div>
+  </div>
+
+  <!-- System Footer -->
+  <footer class="mt-8 text-center">
+    <p class="text-[12px] text-on-surface-variant opacity-60">
+      © <%= new Date().getFullYear() %> <%= company && company.company_name ? company.company_name : 'বায়তুর রহমান জামে মসজিদ' %>.<br/>
+      Secure Internal Portal
+    </p>
+  </footer>
+</main>
+
+<script>
+  // Hover effect for pattern background
+  document.addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth) * 5;
+      const y = (e.clientY / window.innerHeight) * 5;
+      const pattern = document.querySelector('.mosque-pattern');
+      if (pattern) {
+          pattern.style.transform = `translate(${x}px, ${y}px)`;
+      }
+  });
+
+  // Password hide/show toggle
+  const togglePasswordBtn = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('password');
+  if (togglePasswordBtn && passwordInput) {
+      togglePasswordBtn.addEventListener('click', () => {
+          const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+          passwordInput.setAttribute('type', type);
+          togglePasswordBtn.querySelector('.material-symbols-outlined').textContent = type === 'password' ? 'visibility' : 'visibility_off';
+      });
+  }
+
+  // Spinner on submit
+  const loginForm = document.getElementById('loginForm');
+  loginForm.addEventListener('submit', (e) => {
+      const btn = document.getElementById('submitBtn');
+      if (btn) {
+          btn.style.pointerEvents = 'none';
+          btn.innerHTML = `
+              <svg class="animate-spin h-5 w-5 text-white inline me-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="width: 1.25rem; height: 1.25rem;">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              প্রবেশ করা হচ্ছে...
+          `;
+      }
+  });
+</script>

@@ -1,0 +1,61 @@
+<%
+  const isEdit = announcement !== null;
+  const action = isEdit ? `/landing/announcements/${announcement.id}/edit` : '/landing/announcements/new';
+%>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><%= title %></h3>
+  <a href="/landing/announcements" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> ফিরে যান</a>
+</div>
+
+<div class="card shadow-sm"><div class="card-body">
+  <form method="post" action="<%= action %>?_csrf=<%= encodeURIComponent(csrfToken) %>" class="row g-3">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+    <div class="col-md-6">
+      <label class="form-label required">শিরোনাম (বাংলা)</label>
+      <input type="text" name="title_bn" class="form-control" value="<%= isEdit ? announcement.title_bn : '' %>" required />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label required">শিরোনাম (ইংরেজি)</label>
+      <input type="text" name="title_en" class="form-control" value="<%= isEdit ? announcement.title_en : '' %>" required />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">ঘোষণার বিবরণ (বাংলা)</label>
+      <textarea name="content_bn" class="form-control" rows="4"><%= isEdit ? announcement.content_bn : '' %></textarea>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">ঘোষণার বিবরণ (ইংরেজি)</label>
+      <textarea name="content_en" class="form-control" rows="4"><%= isEdit ? announcement.content_en : '' %></textarea>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label required">বিভাগ (Category)</label>
+      <select name="category" class="form-select">
+        <option value="general" <%= isEdit && announcement.category === 'general' ? 'selected' : '' %>>সাধারণ (General)</option>
+        <option value="emergency" <%= isEdit && announcement.category === 'emergency' ? 'selected' : '' %>>জরুরি (Emergency)</option>
+        <option value="event" <%= isEdit && announcement.category === 'event' ? 'selected' : '' %>>অনুষ্ঠান (Event)</option>
+        <option value="meeting" <%= isEdit && announcement.category === 'meeting' ? 'selected' : '' %>>মিটিং (Meeting)</option>
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label required">প্রকাশের তারিখ</label>
+      <input type="date" name="publish_date" class="form-control" value="<%= isEdit ? announcement.publish_date.toISOString().slice(0, 10) : new Date().toISOString().slice(0,10) %>" required />
+    </div>
+
+    <div class="col-12">
+      <div class="form-check form-switch mt-2">
+        <input class="form-check-input" type="checkbox" name="is_active" id="isActiveSwitch" value="true" <%= !isEdit || announcement.is_active ? 'checked' : '' %>>
+        <label class="form-check-label font-weight-bold" for="isActiveSwitch">সক্রিয় রাখুন (ল্যান্ডিং পেজে প্রদর্শন করার জন্য)</label>
+      </div>
+    </div>
+
+    <div class="col-12 mt-4">
+      <button class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> সংরক্ষণ করুন</button>
+    </div>
+  </form>
+</div></div>

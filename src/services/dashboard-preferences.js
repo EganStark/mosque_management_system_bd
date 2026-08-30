@@ -1,0 +1,7 @@
+const db = require('../config/db');
+const WIDGETS = ['welcome', 'controls', 'performance', 'schedule', 'stats'];
+function validOrder(value) { const input = Array.isArray(value) ? value : String(value || '').split(','); const unique = [...new Set(input.filter((item) => WIDGETS.includes(item)))]; return [...unique, ...WIDGETS.filter((item) => !unique.includes(item))]; }
+async function get(userId) { const row = await db('user_dashboard_preferences').where({ user_id: userId }).first(); const hidden = Array.isArray(row && row.hidden_widgets) ? row.hidden_widgets.filter((item) => WIDGETS.includes(item)) : []; return { hidden, order: validOrder(row && row.widget_order), widgets: WIDGETS }; }
+async function saveLayout(userId, visible, order = WIDGETS) { const shown = new Set((Array.isArray(visible) ? visible : [visible]).filter(Boolean)); const hidden = WIDGETS.filter((widget) => !shown.has(widget)); const normalizedOrder = validOrder(order); const values = { user_id: userId, hidden_widgets: JSON.stringify(hidden), widget_order: JSON.stringify(normalizedOrder), updated_by: userId, updated_at: db.fn.now() }; await db('user_dashboard_preferences').insert(values).onConflict('user_id').merge(values); return { hidden, order: normalizedOrder, widgets: WIDGETS }; }
+async function saveVisible(userId, visible) { const current = await get(userId); return saveLayout(userId, visible, current.order); }
+module.exports = { WIDGETS, get, saveVisible, saveLayout, validOrder };

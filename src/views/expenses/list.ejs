@@ -1,35 +1,26 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="mb-0">খরচ ব্যবস্থাপনা</h3>
-  <div>
-    <% if (currentUser.role !== 'viewer') { %>
-    <a href="/expenses/heads" class="btn btn-outline-secondary"><i class="bi bi-tags me-1"></i> খরচের খাত</a>
-    <a href="/expenses/new" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> নতুন খরচ</a>
-    <% } %>
-  </div>
+﻿<div class="d-flex justify-content-between align-items-center mb-3">
+  <div><h3 class="mb-1">খরচ ব্যবস্থাপনা</h3><p class="text-muted mb-0">ভাউচার ও পেমেন্ট উৎসসহ সকল ব্যয়ের রেকর্ড</p></div>
+  <div><% if(currentUser.role === 'admin'){ %><a href="/expenses/heads" class="btn btn-outline-secondary"><i class="bi bi-tags me-1"></i> খরচের খাত</a><% } %> <% if(currentUser.role !== 'viewer'){ %><a href="/expenses/new" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> নতুন খরচ</a><% } %></div>
 </div>
-<div class="card"><div class="card-body"><div class="table-responsive">
-  <table class="table table-striped table-hover datatable w-100">
-    <thead><tr><th>ক্রমিক</th><th>খরচের ধরন</th><th>বিবরণ</th><th>পরিমাণ</th><th>দর</th><th>টাকা</th><th>তারিখ</th><th class="no-print">অ্যাকশন</th></tr></thead>
-    <tbody>
-      <% rows.forEach(function(e, i){ %>
-      <tr>
-        <td><%= bn.toBnDigits(i+1) %></td>
-        <td><%= e.head_name || '' %></td>
-        <td><%= e.purpose || '' %></td>
-        <td><%= e.unit!=null ? bn.toBnDigits(e.unit) : '' %></td>
-        <td><%= e.rate!=null ? bn.toBnDigits(e.rate) : '' %></td>
-        <td><%= bn.money(e.amount) %></td>
-        <td><%= bn.date(e.date) %></td>
-        <td class="no-print">
-          <% if (currentUser.role !== 'viewer') { %>
-          <form method="post" action="/expenses/<%= e.id %>/delete" class="d-inline confirm-delete">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-          </form>
-          <% } %>
-        </td>
-      </tr>
-      <% }) %>
-    </tbody>
-  </table>
-</div></div></div>
+<div class="card"><div class="card-body"><div class="table-responsive"><table class="table table-hover datatable w-100">
+  <thead><tr><th>#</th><th>খাত ও বিবরণ</th><th>প্রাপক</th><th>ভাউচার</th><th>পেমেন্ট</th><th>পরিমাণ</th><th>তারিখ</th><th>অবস্থা</th><th class="no-print">অ্যাকশন</th></tr></thead>
+  <tbody><% rows.forEach(function(e,i){ %><tr class="<%= e.status === 'cancelled' ? 'opacity-50' : '' %>">
+    <td><%= bn.toBnDigits(i+1) %></td><td><strong><%= e.head_name || 'অন্যান্য' %></strong><small class="d-block text-muted"><%= e.purpose || '' %></small></td>
+    <td><%= e.payee || '—' %></td><td><%= e.voucher_no ? bn.toBnDigits(e.voucher_no) : '—' %></td>
+    <td><%= e.payment_method === 'bank' ? (e.bank_name || 'ব্যাংক') : (e.payment_method === 'mobile_banking' ? 'মোবাইল ব্যাংকিং' : 'নগদ') %></td>
+    <td class="fw-bold text-danger">৳ <%= bn.money(e.amount) %><% if(e.budget_position){ %><small class="d-block <%= e.budget_position.exceeds?'text-danger':'text-muted' %>"><%= e.budget_position.exceeds?'বাজেট অতিক্রম করবে':'বাজেট অবশিষ্ট' %>: ৳ <%= bn.money(e.budget_position.remaining) %></small><% } %></td><td><%= bn.date(e.date) %></td>
+    <td><span class="badge <%= ['cancelled','rejected'].includes(e.status) ? 'bg-danger-subtle text-danger' : e.status === 'pending' ? 'bg-warning-subtle text-warning' : 'bg-success-subtle text-success' %>"><%= ({cancelled:'বাতিল',rejected:'প্রত্যাখ্যাত',pending:'অনুমোদনের অপেক্ষায়',posted:'অনুমোদিত'})[e.status] || e.status %></span></td>
+    <td class="no-print"><div class="d-flex gap-1"><a href="/expenses/<%= e.id %>/voucher" class="btn btn-sm btn-outline-primary" title="ভাউচার"><i class="bi bi-file-earmark-text"></i></a><% if(currentUser.role === 'admin' && e.status === 'pending'){ %><form method="post" action="/expenses/<%= e.id %>/decision" class="d-flex gap-1"><input type="hidden" name="_csrf" value="<%= csrfToken %>"/><input name="decision_notes" class="form-control form-control-sm" placeholder="সিদ্ধান্তের মন্তব্য"/><button name="decision" value="approve" class="btn btn-sm btn-success" title="অনুমোদন"><i class="bi bi-check-lg"></i></button><button name="decision" value="reject" class="btn btn-sm btn-outline-danger" title="প্রত্যাখ্যান"><i class="bi bi-x-lg"></i></button></form><% } %><% if(currentUser.role === 'admin' && e.status === 'posted'){ %><form method="post" action="/expenses/<%= e.id %>/cancel" class="d-flex gap-1" onsubmit="return confirm('এই খরচের রেকর্ড বাতিল করবেন?')"><input type="hidden" name="_csrf" value="<%= csrfToken %>"/><input name="cancellation_reason" class="form-control form-control-sm" placeholder="বাতিলের কারণ" required/><button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle"></i></button></form><% } %></div></td>
+  </tr><% }) %></tbody>
+</table></div></div></div>
+<script>
+  document.querySelectorAll('form[action$="/decision"]').forEach((form) => {
+    if (form.querySelector('[name="budget_override_reason"]')) return;
+    const input = document.createElement('input');
+    input.name = 'budget_override_reason';
+    input.className = 'form-control form-control-sm';
+    input.placeholder = 'বাজেট ছাড়ের কারণ (প্রয়োজনে)';
+    const approve = form.querySelector('button[value="approve"]');
+    form.insertBefore(input, approve);
+  });
+</script>

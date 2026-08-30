@@ -1,0 +1,205 @@
+﻿<div
+  class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4"
+>
+  <div>
+    <p class="text-uppercase text-primary fw-bold small mb-1">
+      <%= String(item.payroll_month).slice(0,7) %>
+    </p>
+    <h3 class="mb-1"><%= item.name_bn %> — বেতন</h3>
+    <p class="text-muted mb-0">
+      <%= item.position_bn %> · <%= item.phone||'' %>
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="/staff-operations" class="btn btn-outline-secondary">বেতন তালিকা</a
+    ><button onclick="window.print()" class="btn btn-outline-primary">
+      প্রিন্ট
+    </button>
+  </div>
+</div>
+<% var payrollReserved=(item.paymentRequests||[]).filter(function(r){return ['pending','processing'].includes(r.status)}).reduce(function(sum,r){return sum+Number(r.amount)},0), payrollAvailable=Math.max(0,Number(item.net_payable)-Number(item.amount_paid)-payrollReserved); %>
+<div class="row g-4 mb-4">
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header">বেতন হিসাব</div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <span>মূল বেতন</span
+          ><strong>৳ <%= bn.money(item.basic_salary) %></strong>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>ভাতা</span><strong>৳ <%= bn.money(item.allowances) %></strong>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>কর্তন</span
+          ><strong class="text-danger"
+            >৳ <%= bn.money(item.deductions) %></strong
+          >
+        </div>
+        <div class="d-flex justify-content-between border-top pt-2 mb-2">
+          <span>নিট প্রদেয়</span
+          ><strong>৳ <%= bn.money(item.net_payable) %></strong>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span>বকেয়া</span
+          ><strong class="text-danger"
+            >৳ <%= bn.money(Number(item.net_payable)-Number(item.amount_paid))
+            %></strong
+          >
+        </div>
+        <% if(currentUser.role==='admin'&&item.status!=='paid'){ %>
+        <hr />
+        <form
+          method="post"
+          action="/staff-operations/payroll/<%= item.id %>/adjust"
+          class="row g-2"
+        >
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div class="col-md-4">
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              name="allowances"
+              value="<%= item.allowances %>"
+              class="form-control"
+              placeholder="ভাতা"
+            />
+          </div>
+          <div class="col-md-4">
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              name="deductions"
+              value="<%= item.deductions %>"
+              class="form-control"
+              placeholder="কর্তন"
+            />
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-outline-primary w-100">হিসাব আপডেট</button>
+          </div>
+          <div class="col-12">
+            <input
+              name="notes"
+              value="<%= item.notes||'' %>"
+              class="form-control"
+              placeholder="নোট"
+            />
+          </div>
+        </form>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header">বেতন প্রদান</div>
+      <div class="card-body">
+        <% if(item.status!=='paid'&&currentUser.role!=='viewer'&&payrollAvailable>0){ %>
+        <form
+          method="post"
+          action="/staff-operations/payroll/<%= item.id %>/pay"
+          class="row g-3"
+        >
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div class="col-12">
+            <label class="form-label">পরিমাণ</label
+            ><input
+              type="number"
+              min="0.01"
+              max="<%= payrollAvailable %>"
+              step="0.01"
+              name="amount"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="col-12">
+            <label class="form-label">তারিখ</label
+            ><input
+              type="date"
+              name="payment_date"
+              value="<%= new Date().toISOString().slice(0,10) %>"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="col-12">
+            <select name="payment_method" class="form-select">
+              <option value="cash">নগদ</option>
+              <option value="bank">ব্যাংক</option>
+              <option value="mobile_banking">মোবাইল ব্যাংকিং</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <input
+              name="reference"
+              class="form-control"
+              placeholder="লেনদেন রেফারেন্স"
+            />
+          </div>
+          <div class="col-12">
+            <select name="bank_id" class="form-select">
+              <option value="">ব্যাংক হিসাব (শুধু ব্যাংক পেমেন্টে)</option>
+              <% banks.forEach(function(bank){ %>
+              <option value="<%= bank.id %>"><%= bank.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-12">
+            <select name="mobile_wallet_id" class="form-select">
+              <option value="">মোবাইল ওয়ালেট (শুধু মোবাইল পেমেন্টে)</option>
+              <% wallets.forEach(function(wallet){ %>
+              <option value="<%= wallet.id %>"><%= wallet.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-12">
+            <button class="btn btn-success w-100">অনুমোদনের জন্য পাঠান</button>
+          </div>
+        </form>
+        <% }else{ %>
+        <div class="alert alert-success mb-0">
+          এই মাসের বেতন সম্পূর্ণ পরিশোধিত।
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card mb-4"><div class="card-header d-flex justify-content-between"><span>Payroll payment authorization</span><span class="badge text-bg-light">Available: ৳ <%= bn.money(payrollAvailable) %></span></div><div class="card-body p-0"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Date</th><th>Amount</th><th>Requested by</th><th>Status</th><th></th></tr></thead><tbody>
+<% (item.paymentRequests||[]).forEach(function(request){ %><tr><td><%= bn.date(request.payment_date) %></td><td>৳ <%= bn.money(request.amount) %></td><td><%= request.requester_name||'—' %></td><td><span class="badge <%= request.status==='approved'?'text-bg-success':request.status==='rejected'?'text-bg-danger':'text-bg-warning' %>"><%= request.status %></span></td><td><% if(currentUser.role==='admin'&&request.status==='pending'){ %><form method="post" action="/staff-operations/payroll/<%= item.id %>/payment-requests/<%= request.id %>/decision" class="d-flex gap-2"><input type="hidden" name="_csrf" value="<%= csrfToken %>"/><input name="decision_notes" class="form-control form-control-sm" placeholder="Decision note"/><input name="budget_override_reason" class="form-control form-control-sm" placeholder="Budget override (if needed)"/><button name="decision" value="approved" class="btn btn-sm btn-success">Approve</button><button name="decision" value="rejected" class="btn btn-sm btn-outline-danger">Reject</button></form><% } %></td></tr><% }) %>
+<% if(!(item.paymentRequests||[]).length){ %><tr><td colspan="5" class="text-center text-muted py-4">No payment request submitted.</td></tr><% } %></tbody></table></div></div></div>
+<div class="card">
+  <div class="card-header">পেমেন্ট ইতিহাস</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>তারিখ</th>
+            <th>পদ্ধতি</th>
+            <th>রেফারেন্স</th>
+            <th>প্রদানকারী</th>
+            <th>ভাউচার</th>
+            <th class="text-end">পরিমাণ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% item.payments.forEach(function(p){ %>
+          <tr>
+            <td><%= bn.date(p.payment_date) %></td>
+            <td><%= p.payment_method %></td>
+            <td><%= p.reference||'—' %></td>
+            <td><%= p.paid_by_name||'—' %></td>
+            <td><a href="/expenses/<%= p.expense_id %>/voucher">দেখুন</a></td>
+            <td class="text-end">৳ <%= bn.money(p.amount) %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

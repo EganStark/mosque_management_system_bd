@@ -1,19 +1,65 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
+  <script>
+    (function () {
+      var saved = localStorage.getItem('brjm-admin-theme');
+      var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.classList.toggle('dark', dark);
+      document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+    })();
+  </script>
   <%- include('partials/head') %>
+  <style>
+    /* Sidebar toggle transition support */
+    #sidebar {
+      transition: transform 0.3s ease;
+    }
+    .app-main {
+      transition: margin-left 0.3s ease;
+    }
+    .app-shell.collapsed #sidebar {
+      transform: translateX(-260px);
+    }
+    .app-shell.collapsed .app-main {
+      margin-left: 0;
+    }
+    @media (max-width: 1024px) {
+      #sidebar {
+        transform: translateX(-260px);
+      }
+      .app-main {
+        margin-left: 0 !important;
+      }
+      .app-shell.active-mobile #sidebar {
+        transform: translateX(0);
+      }
+    }
+  </style>
 </head>
-<body>
-  <div class="app-shell">
+<body class="bg-surface font-body-md text-on-surface antialiased">
+  <div class="flex min-h-screen app-shell">
+    <!-- Sidebar -->
     <%- include('partials/sidebar') %>
-    <div class="app-main">
+
+    <!-- Main Content Area -->
+    <div class="app-main flex-1 ml-[260px] bg-background min-h-screen flex flex-col">
+      <!-- Navbar -->
       <%- include('partials/navbar') %>
-      <main class="content p-3 p-md-4">
+
+      <!-- Content -->
+      <main class="flex-1 p-4 md:p-6 lg:p-8 max-w-[1500px] mx-auto w-full">
         <%- include('partials/flash') %>
         <%- body %>
       </main>
-      <footer class="footer text-center text-muted small py-3">
-        &copy; <%= bn.toBnDigits(new Date().getFullYear()) %> <%= company && company.company_name ? company.company_name : 'বায়তুর রহমান জামে মসজিদ' %>
+
+      <!-- Footer -->
+      <footer class="w-full py-stack-md border-t border-border-subtle bg-surface-container-low mt-auto">
+        <div class="flex flex-col items-center justify-center gap-2 px-gutter text-center">
+          <p class="font-label-md text-label-md text-on-surface-variant mb-0">
+            &copy; <%= bn.toBnDigits(new Date().getFullYear()) %> <%= company && company.company_name ? company.company_name : 'বায়তুর রহমান জামে মসজিদ' %>
+          </p>
+        </div>
       </footer>
     </div>
   </div>

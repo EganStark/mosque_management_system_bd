@@ -1,0 +1,3 @@
+const TABLES = ['events', 'staff_members', 'announcements', 'gallery_images', 'faqs', 'janaza_notices'];
+exports.up = async (knex) => { for (const table of TABLES) await knex.schema.alterTable(table, (t) => { t.string('publication_status').notNullable().defaultTo('published'); t.timestamp('published_at').defaultTo(knex.fn.now()); t.integer('published_by').references('id').inTable('users').onDelete('SET NULL'); t.index(['publication_status', 'is_active']); }); };
+exports.down = async (knex) => { for (const table of [...TABLES].reverse()) await knex.schema.alterTable(table, (t) => { t.dropIndex(['publication_status', 'is_active']); t.dropColumn('published_by'); t.dropColumn('published_at'); t.dropColumn('publication_status'); }); };

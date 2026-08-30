@@ -1,53 +1,193 @@
 <%
-  function active(prefix) { return activePath && activePath.indexOf(prefix) === 0 ? 'active' : ''; }
+  function isPath(path, exact = false) {
+    return exact ? activePath === path : Boolean(activePath && activePath.indexOf(path) === 0);
+  }
+  function linkClass(path, exact = false) {
+    return 'sidebar-link' + (isPath(path, exact) ? ' is-active' : '');
+  }
   var role = currentUser ? currentUser.role : 'viewer';
   var isAdmin = role === 'admin';
+  function can(permission) {
+    return isAdmin || Boolean(navCapabilities && navCapabilities[permission]);
+  }
+  var canManageWebsite = can('website.manage');
+  var reportsOpen = isPath('/reports');
+  var websiteOpen = isPath('/landing');
+  var setupOpen = isPath('/books') || isPath('/occupations') || isPath('/locations') || isPath('/settings') || isPath('/users');
 %>
-<nav id="sidebar" class="sidebar">
-  <div class="sidebar-brand">
-    <i class="bi bi-moon-stars-fill me-2"></i>
-    <span><%= company && company.company_name ? company.company_name : 'বায়তুর রহমান' %></span>
+
+<aside id="sidebar" class="fixed left-0 top-0 z-40 flex h-full w-[260px] flex-col overflow-y-auto bg-admin-sidebar py-4">
+  <div class="sidebar-brand px-5 pb-4">
+    <div class="sidebar-brand-mark"><span class="material-symbols-outlined">mosque</span></div>
+    <div class="min-w-0">
+      <h1 class="truncate text-base font-bold text-white"><%= company && company.company_name ? company.company_name : 'বায়তুর রহমান মসজিদ' %></h1>
+      <p class="mb-0 text-[11px] text-surface-variant/60">মসজিদ ব্যবস্থাপনা</p>
+    </div>
   </div>
-  <ul class="nav flex-column">
-    <li><a class="nav-link <%= active('/dashboard') %>" href="/dashboard"><i class="bi bi-speedometer2"></i> ড্যাশবোর্ড</a></li>
 
-    <li class="nav-section">সদস্য</li>
-    <li><a class="nav-link <%= active('/members') %>" href="/members"><i class="bi bi-people"></i> সদস্য তালিকা</a></li>
-    <% if (role !== 'viewer') { %>
-    <li><a class="nav-link" href="/members/new"><i class="bi bi-person-plus"></i> নতুন সদস্য</a></li>
+  <nav class="sidebar-nav flex-1 px-3" aria-label="প্রধান নেভিগেশন">
+    <p class="sidebar-section-label">ওভারভিউ</p>
+    <a class="<%= linkClass('/dashboard', true) %>" href="/dashboard">
+      <span class="material-symbols-outlined">space_dashboard</span><span>ড্যাশবোর্ড</span>
+    </a>
+    <% if (can('system.manage')) { %><a class="<%= linkClass('/approvals') %>" href="/approvals">
+      <span class="material-symbols-outlined">approval</span><span class="flex-grow-1">অনুমোদন ইনবক্স</span><% if(navApprovals&&navApprovals.total){ %><span class="badge rounded-pill text-bg-warning"><%= navApprovals.total>99?'99+':bn.num(navApprovals.total) %></span><% } %>
+    </a><% } %>
+    <% if (can('reports.view')) { %><a class="<%= linkClass('/calendar') %>" href="/calendar">
+      <span class="material-symbols-outlined">calendar_month</span><span data-bn="সমন্বিত ক্যালেন্ডার" data-en="Unified calendar">সমন্বিত ক্যালেন্ডার</span>
+    </a><% } %>
+
+    <p class="sidebar-section-label">দৈনন্দিন কাজ</p>
+    <% if (can('members.manage')) { %><a class="<%= linkClass('/members') %>" href="/members">
+      <span class="material-symbols-outlined">groups</span><span>সদস্য ব্যবস্থাপনা</span>
+    </a><% } %>
+    <% if (can('monthly.manage')) { %><a class="<%= linkClass('/monthly-payments') %>" href="/monthly-payments">
+      <span class="material-symbols-outlined">calendar_month</span><span>মাসিক চাঁদা</span>
+    </a>
+    <a class="<%= linkClass('/communications') %>" href="/communications">
+      <span class="material-symbols-outlined">campaign</span><span>যোগাযোগ কেন্দ্র</span>
+    </a><% } %>
+    <% if (can('people.manage')) { %><a class="<%= linkClass('/public-inbox') %>" href="/public-inbox">
+      <span class="material-symbols-outlined">inbox</span><span>পাবলিক ইনবক্স</span>
+    </a>
+    <a class="<%= linkClass('/programs') %>" href="/programs">
+      <span class="material-symbols-outlined">school</span><span>প্রোগ্রাম ও শিক্ষা</span>
+    </a>
+    <a class="<%= linkClass('/bookings') %>" href="/bookings">
+      <span class="material-symbols-outlined">event_available</span><span>সুবিধা ও বুকিং</span>
+    </a>
+    <a class="<%= linkClass('/welfare') %>" href="/welfare">
+      <span class="material-symbols-outlined">volunteer_activism</span><span>কল্যাণ ও সহায়তা</span>
+    </a>
+    <a class="<%= linkClass('/loans') %>" href="/loans">
+      <span class="material-symbols-outlined">request_quote</span><span>ঋণ ও কিস্তি</span>
+    </a>
+    <a class="<%= linkClass('/pledges') %>" href="/pledges">
+      <span class="material-symbols-outlined">handshake</span><span>দান অঙ্গীকার ও বকেয়া</span>
+    </a>
+    <a class="<%= linkClass('/management-team') %>" href="/management-team">
+      <span class="material-symbols-outlined">groups_2</span><span>কমিটি ও স্টাফ</span>
+    </a>
+    <a class="<%= linkClass('/governance-meetings') %>" href="/governance-meetings">
+      <span class="material-symbols-outlined">gavel</span><span>সভা ও সিদ্ধান্ত</span>
+    </a>
+    <a class="<%= linkClass('/tasks') %>" href="/tasks">
+      <span class="material-symbols-outlined">task_alt</span><span data-bn="কাজ ও ফলো-আপ" data-en="Tasks & follow-up">কাজ ও ফলো-আপ</span>
+    </a>
+    <a class="<%= linkClass('/documents') %>" href="/documents">
+      <span class="material-symbols-outlined">folder_copy</span><span>নথি ও আর্কাইভ</span>
+    </a>
+    <a class="<%= linkClass('/staff-operations') %>" href="/staff-operations">
+      <span class="material-symbols-outlined">badge</span><span>স্টাফ ডিউটি ও বেতন</span>
+    </a><% } %>
+    <% if (can('deceased.manage')) { %><a class="<%= linkClass('/deceased') %>" href="/deceased">
+      <span class="material-symbols-outlined">history_edu</span><span>মরহুম সদস্য</span>
+    </a><% } %>
+    <% if (can('assets.manage')) { %><a class="<%= linkClass('/assets') %>" href="/assets">
+      <span class="material-symbols-outlined">inventory_2</span><span>সম্পদ রেজিস্টার</span>
+    </a>
+    <a class="<%= linkClass('/maintenance') %>" href="/maintenance">
+      <span class="material-symbols-outlined">build_circle</span><span>রক্ষণাবেক্ষণ</span>
+    </a>
+    <a class="<%= linkClass('/inventory') %>" href="/inventory">
+      <span class="material-symbols-outlined">warehouse</span><span>স্টোর ও মজুত</span>
+    </a><% } %>
+    <% if (can('finance.manage')) { %><a class="<%= linkClass('/collections') %>" href="/collections">
+      <span class="material-symbols-outlined">payments</span><span>আদায়</span>
+    </a>
+    <a class="<%= linkClass('/expenses') %>" href="/expenses">
+      <span class="material-symbols-outlined">account_balance_wallet</span><span>খরচ</span>
+    </a>
+    <a class="<%= linkClass('/procurement') %>" href="/procurement">
+      <span class="material-symbols-outlined">shopping_cart_checkout</span><span>ক্রয় ও সরবরাহ</span>
+    </a>
+    <a class="<%= linkClass('/treasury') %>" href="/treasury">
+      <span class="material-symbols-outlined">account_balance</span><span>ক্যাশ ও ব্যাংক</span>
+    </a>
+    <a class="<%= linkClass('/budgets') %>" href="/budgets">
+      <span class="material-symbols-outlined">finance_mode</span><span>বাজেট পরিকল্পনা</span>
+    </a>
+    <a class="<%= linkClass('/accounting-periods') %>" href="/accounting-periods">
+      <span class="material-symbols-outlined">lock_clock</span><span>মাসিক হিসাব বন্ধ</span>
+    </a><% } %>
+
+    <% if (can('reports.view')) { %><details class="sidebar-group" <%= reportsOpen ? 'open' : '' %>>
+      <summary class="sidebar-group-summary <%= reportsOpen ? 'is-active' : '' %>">
+        <span class="material-symbols-outlined">analytics</span><span>রিপোর্ট</span><span class="material-symbols-outlined sidebar-chevron">expand_more</span>
+      </summary>
+      <div class="sidebar-submenu">
+        <a class="<%= linkClass('/reports', true) %>" href="/reports">রিপোর্ট কেন্দ্র</a>
+        <a class="<%= linkClass('/reports/member-ledger') %>" href="/reports/member-ledger">সদস্য লেজার</a>
+        <a class="<%= linkClass('/reports/community') %>" href="/reports/community">কমিউনিটি বিশ্লেষণ</a>
+        <a class="<%= linkClass('/reports/monthly-dues') %>" href="/reports/monthly-dues">মাসিক বকেয়া</a>
+        <a class="<%= linkClass('/reports/category-summary') %>" href="/reports/category-summary">খাতভিত্তিক সারাংশ</a>
+        <a class="<%= linkClass('/reports/operations') %>" href="/reports/operations">পরিচালনাগত রিপোর্ট</a>
+        <a class="<%= linkClass('/reports/tasks') %>" href="/reports/tasks">কাজ ও কর্মদক্ষতা</a>
+        <a class="<%= linkClass('/reports/accountability') %>" href="/reports/accountability">আর্থিক জবাবদিহি</a>
+        <a class="<%= linkClass('/data-quality') %>" href="/data-quality">ডেটা স্বাস্থ্য কেন্দ্র</a>
+        <a class="<%= linkClass('/reports/collection') %>" href="/reports/collection">আদায় রিপোর্ট</a>
+        <a class="<%= linkClass('/reports/expense') %>" href="/reports/expense">খরচ রিপোর্ট</a>
+        <a class="<%= linkClass('/reports/loss-profit') %>" href="/reports/loss-profit">আয়–ব্যয় সারাংশ</a>
+        <a class="<%= linkClass('/reports/bank-statement') %>" href="/reports/bank-statement">ব্যাংক স্টেটমেন্ট</a>
+      </div>
+    </details><% } %>
+
+    <% if (canManageWebsite) { %>
+      <p class="sidebar-section-label">পরিচালনা</p>
+      <details class="sidebar-group" <%= websiteOpen ? 'open' : '' %>>
+        <summary class="sidebar-group-summary <%= websiteOpen ? 'is-active' : '' %>">
+          <span class="material-symbols-outlined">language</span><span>ওয়েবসাইট কনটেন্ট</span><span class="material-symbols-outlined sidebar-chevron">expand_more</span>
+        </summary>
+        <div class="sidebar-submenu">
+          <a class="<%= linkClass('/landing', true) %>" href="/landing">কনটেন্ট ওভারভিউ</a>
+          <a class="<%= linkClass('/landing/prayer-times') %>" href="/landing/prayer-times">নামাজের সময়</a>
+          <a class="<%= linkClass('/landing/events') %>" href="/landing/events">অনুষ্ঠান</a>
+          <a class="<%= linkClass('/landing/announcements') %>" href="/landing/announcements">ঘোষণা</a>
+          <a class="<%= linkClass('/landing/staff') %>" href="/landing/staff">স্টাফ</a>
+          <a class="<%= linkClass('/landing/gallery') %>" href="/landing/gallery">গ্যালারি</a>
+          <a class="<%= linkClass('/landing/janaza') %>" href="/landing/janaza">জানাজা নোটিশ</a>
+          <a class="<%= linkClass('/landing/faq') %>" href="/landing/faq">সাধারণ প্রশ্ন</a>
+        </div>
+      </details>
+
     <% } %>
 
-    <li class="nav-section">আর্থিক</li>
-    <li><a class="nav-link <%= active('/collections') %>" href="/collections"><i class="bi bi-cash-coin"></i> আদায়</a></li>
-    <% if (role !== 'viewer') { %>
-    <li><a class="nav-link" href="/collections/new"><i class="bi bi-plus-circle"></i> নতুন আদায়</a></li>
+    <% if (can('system.manage')) { %>
+      <details class="sidebar-group" <%= setupOpen ? 'open' : '' %>>
+        <summary class="sidebar-group-summary <%= setupOpen ? 'is-active' : '' %>">
+          <span class="material-symbols-outlined">tune</span><span>সেটআপ ও প্রশাসন</span><span class="material-symbols-outlined sidebar-chevron">expand_more</span>
+        </summary>
+        <div class="sidebar-submenu">
+          <a class="<%= linkClass('/settings/company') %>" href="/settings/company">প্রতিষ্ঠানের তথ্য</a>
+          <a class="<%= linkClass('/users') %>" href="/users">ব্যবহারকারী</a>
+          <a class="<%= linkClass('/security') %>" href="/security">নিরাপত্তা ও অডিট</a>
+          <a class="<%= linkClass('/backups') %>" href="/backups">ব্যাকআপ ও পুনরুদ্ধার</a>
+          <a class="<%= linkClass('/books/types') %>" href="/books/types">রশিদ বইয়ের ধরন</a>
+          <a class="<%= linkClass('/books/numbers') %>" href="/books/numbers">রশিদ বই নম্বর</a>
+          <a class="<%= linkClass('/occupations') %>" href="/occupations">পেশা</a>
+          <details class="sidebar-nested" <%= isPath('/locations') ? 'open' : '' %>>
+            <summary>ঠিকানা ডেটা <span class="material-symbols-outlined">expand_more</span></summary>
+            <div>
+              <a class="<%= linkClass('/locations/division') %>" href="/locations/division">বিভাগ</a>
+              <a class="<%= linkClass('/locations/district') %>" href="/locations/district">জেলা</a>
+              <a class="<%= linkClass('/locations/thana') %>" href="/locations/thana">থানা</a>
+              <a class="<%= linkClass('/locations/post_office') %>" href="/locations/post_office">পোস্ট অফিস</a>
+              <a class="<%= linkClass('/locations/village') %>" href="/locations/village">গ্রাম</a>
+              <a class="<%= linkClass('/locations/area') %>" href="/locations/area">এলাকা</a>
+            </div>
+          </details>
+        </div>
+      </details>
     <% } %>
-    <li><a class="nav-link <%= active('/expenses') %>" href="/expenses"><i class="bi bi-wallet2"></i> খরচ</a></li>
-    <li><a class="nav-link <%= active('/banks') %>" href="/banks"><i class="bi bi-bank"></i> ব্যাংক</a></li>
+  </nav>
 
-    <li class="nav-section">রিপোর্ট</li>
-    <li><a class="nav-link <%= active('/reports/collection') %>" href="/reports/collection"><i class="bi bi-file-earmark-text"></i> আদায় রিপোর্ট</a></li>
-    <li><a class="nav-link <%= active('/reports/expense') %>" href="/reports/expense"><i class="bi bi-file-earmark-minus"></i> খরচ রিপোর্ট</a></li>
-    <li><a class="nav-link <%= active('/reports/loss-profit') %>" href="/reports/loss-profit"><i class="bi bi-graph-up-arrow"></i> লাভ ও ক্ষতি</a></li>
-    <li><a class="nav-link <%= active('/reports/bank-statement') %>" href="/reports/bank-statement"><i class="bi bi-journal-text"></i> ব্যাংক স্টেটমেন্ট</a></li>
-
-    <% if (isAdmin) { %>
-    <li class="nav-section">প্রশাসনিক সেটিংস</li>
-    <li><a class="nav-link <%= active('/books/types') %>" href="/books/types"><i class="bi bi-book"></i> বই এর ধরন</a></li>
-    <li><a class="nav-link <%= active('/books/numbers') %>" href="/books/numbers"><i class="bi bi-123"></i> বই নম্বর</a></li>
-
-    <li class="nav-section">অ্যাকাউন্ট সেটিংস</li>
-    <li><a class="nav-link <%= active('/occupations') %>" href="/occupations"><i class="bi bi-briefcase"></i> পেশা</a></li>
-    <li><a class="nav-link <%= active('/locations/division') %>" href="/locations/division"><i class="bi bi-geo-alt"></i> বিভাগ</a></li>
-    <li><a class="nav-link <%= active('/locations/district') %>" href="/locations/district"><i class="bi bi-geo"></i> জেলা</a></li>
-    <li><a class="nav-link <%= active('/locations/thana') %>" href="/locations/thana"><i class="bi bi-pin-map"></i> থানা</a></li>
-    <li><a class="nav-link <%= active('/locations/post_office') %>" href="/locations/post_office"><i class="bi bi-mailbox"></i> পোস্ট অফিস</a></li>
-    <li><a class="nav-link <%= active('/locations/village') %>" href="/locations/village"><i class="bi bi-houses"></i> গ্রাম</a></li>
-    <li><a class="nav-link <%= active('/locations/area') %>" href="/locations/area"><i class="bi bi-map"></i> এলাকা</a></li>
-
-    <li class="nav-section">সেটিংস</li>
-    <li><a class="nav-link <%= active('/settings/company') %>" href="/settings/company"><i class="bi bi-building"></i> প্রতিষ্ঠানের তথ্য</a></li>
-    <li><a class="nav-link <%= active('/users') %>" href="/users"><i class="bi bi-person-gear"></i> ব্যবহারকারী</a></li>
-    <% } %>
-  </ul>
-</nav>
+  <div class="sidebar-footer px-3 pt-3">
+    <a href="<%= landingPageUrl %>" target="_blank" rel="noopener noreferrer" class="sidebar-site-link">
+      <span class="material-symbols-outlined">open_in_new</span><span>ওয়েবসাইট দেখুন</span>
+    </a>
+    <form method="post" action="/logout" id="logoutForm" class="m-0">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <button type="submit" class="sidebar-logout"><span class="material-symbols-outlined">logout</span><span>লগআউট</span></button>
+    </form>
+  </div>
+</aside>

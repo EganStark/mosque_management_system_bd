@@ -13,31 +13,34 @@ router.get('/setup', adminOnly, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-router.post('/setup', adminOnly, async (req, res, next) => {
+router.post('/setup', adminOnly, body('name').trim().notEmpty(), body('opening_balance').optional({ checkFalsy: true }).isFloat({ min: 0 }), body('opening_balance_date').optional({ checkFalsy: true }).isISO8601(), async (req, res) => {
   try {
-    await banks.banks.create(req.body.name);
+    if (!validationResult(req).isEmpty()) throw new Error('ব্যাংকের তথ্য সঠিকভাবে দিন।');
+    await banks.banks.create({ name: req.body.name, account_number: req.body.account_number || null, branch_name: req.body.branch_name || null, opening_balance: req.body.opening_balance || 0, opening_balance_date: req.body.opening_balance_date || null });
     req.flash('success', 'ব্যাংক যুক্ত হয়েছে।');
-    res.redirect('/banks/setup');
-  } catch (err) { next(err); }
+  } catch (err) { req.flash('error', err.message); }
+  res.redirect('/banks/setup');
 });
 
-router.post('/setup/:id', adminOnly, async (req, res, next) => {
+router.post('/setup/:id', adminOnly, body('name').trim().notEmpty(), body('opening_balance').optional({ checkFalsy: true }).isFloat({ min: 0 }), body('opening_balance_date').optional({ checkFalsy: true }).isISO8601(), async (req, res) => {
   try {
-    await banks.banks.update(req.params.id, req.body.name);
+    if (!validationResult(req).isEmpty()) throw new Error('ব্যাংকের তথ্য সঠিকভাবে দিন।');
+    await banks.banks.update(req.params.id, { name: req.body.name, account_number: req.body.account_number || null, branch_name: req.body.branch_name || null, opening_balance: req.body.opening_balance || 0, opening_balance_date: req.body.opening_balance_date || null });
     req.flash('success', 'হালনাগাদ হয়েছে।');
-    res.redirect('/banks/setup');
-  } catch (err) { next(err); }
+  } catch (err) { req.flash('error', err.message); }
+  res.redirect('/banks/setup');
 });
 
-router.post('/setup/:id/delete', adminOnly, async (req, res, next) => {
+router.post('/setup/:id/status', adminOnly, body('is_active').isIn(['true', 'false']), async (req, res) => {
   try {
-    await banks.banks.remove(req.params.id);
-    req.flash('success', 'মুছে ফেলা হয়েছে।');
-    res.redirect('/banks/setup');
+    if (!validationResult(req).isEmpty()) throw new Error('সঠিক অবস্থা নির্বাচন করুন।');
+    const active = req.body.is_active === 'true';
+    await banks.banks.setActive(req.params.id, active);
+    req.flash('success', active ? 'ব্যাংক হিসাবটি পুনরায় সক্রিয় হয়েছে।' : 'ব্যাংক হিসাবটি নিষ্ক্রিয় হয়েছে; ইতিহাস সংরক্ষিত আছে।');
   } catch (err) {
-    req.flash('error', 'মুছে ফেলা যায়নি।');
-    res.redirect('/banks/setup');
+    req.flash('error', err.message);
   }
+  res.redirect('/banks/setup');
 });
 
 // --- Transactions ledger ---
@@ -60,7 +63,7 @@ router.post(
   canWrite,
   body('bank_id').notEmpty(),
   body('amount').isFloat({ gt: 0 }),
-  body('date').notEmpty(),
+  body('date').isISO8601(),
   async (req, res, next) => {
     try {
       const errors = validationResult(req);
@@ -85,12 +88,16 @@ router.post(
   }
 );
 
-router.post('/:id/delete', canWrite, async (req, res, next) => {
+router.post('/:id/cancel', adminOnly, body('cancellation_reason').trim().notEmpty(), async (req, res) => {
   try {
-    await banks.transactions.remove(req.params.id);
-    req.flash('success', 'মুছে ফেলা হয়েছে।');
-    res.redirect('/banks');
-  } catch (err) { next(err); }
+    if (!validationResult(req).isEmpty()) throw new Error('বাতিলের কারণ লিখুন।');
+    await banks.transactions.cancel(req.params.id, {
+      cancelled_by: req.session.user.id,
+      cancellation_reason: req.body.cancellation_reason,
+    });
+    req.flash('success', 'ব্যাংক লেনদেনটি অডিট ইতিহাস রেখে বাতিল হয়েছে।');
+  } catch (err) { req.flash('error', err.message); }
+  res.redirect('/banks');
 });
 
 module.exports = router;

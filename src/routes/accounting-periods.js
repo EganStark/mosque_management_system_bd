@@ -1,0 +1,11 @@
+const express = require('express');
+const { body, validationResult } = require('express-validator');
+const { requireAuth, adminOnly } = require('../middleware/auth');
+const periods = require('../services/accounting-periods');
+const router = express.Router(); router.use(requireAuth);
+const now = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; };
+router.get('/', async (req, res, next) => { try { const month = /^\d{4}-\d{2}$/.test(req.query.month || '') ? req.query.month : now(); const [data, history] = await Promise.all([periods.readiness(month), periods.history()]); res.render('accounting-periods/index', { title: 'মাসিক হিসাব বন্ধ', data, history }); } catch (e) { next(e); } });
+router.get('/audit/:id', async (req, res, next) => { try { const event = await periods.auditEvent(req.params.id); if (!event || event.event_type !== 'close') return res.status(404).render('error', { title: 'পাওয়া যায়নি', status: 404, message: 'সমাপনী অডিট প্যাকেজ পাওয়া যায়নি।' }); res.render('accounting-periods/audit', { layout: 'layout_blank', title: event.reference_no, event }); } catch (e) { next(e); } });
+router.post('/close', adminOnly, body('month').matches(/^\d{4}-\d{2}$/), async (req, res) => { try { if (!validationResult(req).isEmpty()) throw new Error('সঠিক মাস দিন'); const event = await periods.close(req.body.month, req.body, req.session.user.id); req.flash('success', `হিসাব মাস বন্ধ হয়েছে — ${event.reference_no}`); } catch (e) { req.flash('error', e.message); } res.redirect(`/accounting-periods?month=${encodeURIComponent(req.body.month || now())}`); });
+router.post('/reopen', adminOnly, body('month').matches(/^\d{4}-\d{2}$/), body('reason').trim().notEmpty(), async (req, res) => { try { if (!validationResult(req).isEmpty()) throw new Error('পুনরায় খোলার কারণ লিখুন'); await periods.reopen(req.body.month, req.body.reason, req.session.user.id); req.flash('success', 'হিসাব মাস পুনরায় খোলা হয়েছে।'); } catch (e) { req.flash('error', e.message); } res.redirect(`/accounting-periods?month=${encodeURIComponent(req.body.month || now())}`); });
+module.exports = router;

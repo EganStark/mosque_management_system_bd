@@ -1,26 +1,73 @@
-<nav class="navbar navbar-expand topbar">
-  <button class="btn btn-sm btn-light me-2" id="sidebarToggle" type="button"><i class="bi bi-list"></i></button>
-  <span class="navbar-brand-text d-none d-md-inline"><%= typeof title !== 'undefined' ? title : '' %></span>
-  <div class="ms-auto d-flex align-items-center">
-    <span class="me-3 text-muted small"><i class="bi bi-calendar3 me-1"></i><%= bn.date(new Date()) %></span>
+<header class="h-16 bg-white border-b border-border-subtle flex items-center justify-between px-6 sticky top-0 z-30 w-full">
+  <!-- Left Side: Toggle & Title -->
+  <div class="flex items-center gap-4">
+    <button class="p-2 hover:bg-surface-container transition-colors rounded-full border-0 bg-transparent flex items-center justify-center text-on-surface-variant" id="sidebarToggle" type="button">
+      <span class="material-symbols-outlined text-[24px]">menu</span>
+    </button>
+    <h2 class="font-headline-md text-lg md:text-xl text-on-surface font-semibold mb-0">
+      <%= typeof title !== 'undefined' ? title : 'ড্যাশবোর্ড ওভারভিউ' %>
+    </h2>
+  </div>
+
+  <% if(currentUser){ %><form action="/search" method="get" class="hidden lg:flex flex-1 max-w-md mx-5" role="search"><div class="input-group input-group-sm"><span class="input-group-text bg-transparent"><span class="material-symbols-outlined text-[18px]">search</span></span><input id="globalSearchInput" name="q" class="form-control" minlength="2" placeholder="সদস্য, রশিদ, নথি খুঁজুন…" aria-label="Global search"/><span class="input-group-text bg-transparent text-muted">Ctrl K</span></div></form><% } %>
+
+  <!-- Right Side: Date, Notifications, Profile -->
+  <div class="flex items-center gap-4">
+    <% if(currentUser){ %><a href="/search" class="lg:hidden p-2 text-on-surface-variant hover:bg-surface-container rounded-full flex" aria-label="Search"><span class="material-symbols-outlined text-[21px]">search</span></a><% } %>
+    <button class="admin-language-toggle px-3 py-2 text-on-surface-variant hover:bg-surface-container transition-colors rounded-full border border-border-subtle bg-transparent flex items-center gap-1.5 font-semibold text-xs" id="adminLanguageToggle" type="button" aria-label="Switch dashboard language" title="বাংলা / English">
+      <span class="material-symbols-outlined text-[18px]">translate</span>
+      <span class="language-label">EN</span>
+    </button>
+    <button class="theme-toggle p-2 text-on-surface-variant hover:bg-surface-container transition-colors rounded-full border border-border-subtle bg-transparent flex items-center justify-center" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Light / dark mode">
+      <span class="material-symbols-outlined text-[20px] theme-icon">dark_mode</span>
+    </button>
+    <!-- Date -->
+    <span class="hidden md:flex items-center gap-2 text-sm text-on-surface-variant font-medium" data-admin-date="<%= new Date().toISOString() %>">
+      <span class="material-symbols-outlined text-[18px]">calendar_month</span>
+      <span class="admin-date-label"><%= bn.date(new Date()) %></span>
+    </span>
+
+    <!-- Operational notifications -->
+    <% if(currentUser){ %><div class="dropdown">
+      <button class="p-2 text-on-surface-variant hover:bg-surface-container transition-colors rounded-full relative border-0 bg-transparent flex items-center justify-center" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications">
+        <span class="material-symbols-outlined text-[22px]">notifications</span>
+        <% if(navNotifications.unreadCount){ %><span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger"><%= navNotifications.unreadCount>9?'9+':bn.num(navNotifications.unreadCount) %></span><% } %>
+      </button>
+      <div class="dropdown-menu dropdown-menu-end shadow border-border-subtle p-0 overflow-hidden" style="width:min(380px,calc(100vw - 24px))">
+        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom"><strong data-bn="নোটিফিকেশন" data-en="Notifications">নোটিফিকেশন</strong><small class="text-muted"><%= bn.num(navNotifications.unreadCount) %> <span data-bn="নতুন" data-en="new">নতুন</span></small></div>
+        <% if(!navNotifications.items.length){ %><p class="text-muted text-center small p-4 mb-0" data-bn="কোনো সক্রিয় নোটিফিকেশন নেই" data-en="No active notifications">কোনো সক্রিয় নোটিফিকেশন নেই</p><% } %>
+        <% navNotifications.items.forEach(function(item){ %><a href="/notifications" class="dropdown-item py-3 border-bottom text-wrap <%= item.unread?'bg-primary bg-opacity-10':'' %>"><strong class="d-block small" data-bn="<%= item.title %>" data-en="<%= item.titleEn %>"><%= item.title %></strong><small class="text-muted"><%= item.detail %></small></a><% }) %>
+        <a href="/notifications" class="d-block text-center py-2 text-decoration-none small fw-bold" data-bn="সব নোটিফিকেশন দেখুন" data-en="View all notifications">সব নোটিফিকেশন দেখুন</a>
+      </div>
+    </div><% } %>
+
+    <!-- Profile Dropdown -->
     <% if (currentUser) { %>
-    <div class="dropdown">
-      <a class="dropdown-toggle text-decoration-none text-dark" href="#" data-bs-toggle="dropdown">
-        <i class="bi bi-person-circle fs-5"></i>
-        <span class="ms-1"><%= currentUser.name %></span>
-        <span class="badge bg-secondary ms-1"><%= currentUser.role %></span>
-      </a>
-      <ul class="dropdown-menu dropdown-menu-end">
-        <li><span class="dropdown-item-text small text-muted"><%= currentUser.username %></span></li>
-        <li><hr class="dropdown-divider" /></li>
-        <li>
-          <form method="post" action="/logout">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-            <button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-1"></i> লগআউট</button>
-          </form>
-        </li>
-      </ul>
-    </div>
+      <div class="dropdown">
+        <a class="dropdown-toggle text-decoration-none flex items-center gap-3 pl-4 border-l border-border-subtle text-dark" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+          <div class="text-end hidden sm:block">
+            <p class="font-label-md text-sm text-on-surface font-semibold mb-0 leading-tight"><%= currentUser.name %></p>
+            <p class="text-[11px] text-on-surface-variant/80 mb-0 uppercase tracking-widest leading-none font-bold">
+              <%= ({ admin: 'এডমিন', collector: 'কালেক্টর', viewer: 'দর্শক' })[currentUser.role] || currentUser.role %>
+            </p>
+          </div>
+          <img src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(currentUser.name) %>&background=006b2c&color=fff&size=80"
+               alt="<%= currentUser.name %>"
+               class="w-9 h-9 rounded-full border border-border-subtle shadow-sm object-cover" />
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end shadow border-border-subtle p-2">
+          <li><span class="dropdown-item-text text-xs text-on-surface-variant opacity-70"><%= currentUser.username %></span></li>
+          <li><hr class="dropdown-divider" /></li>
+          <li>
+            <form method="post" action="/logout" class="m-0">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button class="dropdown-item text-danger d-flex align-items-center gap-2" type="submit">
+                <span class="material-symbols-outlined text-[18px]">logout</span> লগআউট (Logout)
+              </button>
+            </form>
+          </li>
+        </ul>
+      </div>
     <% } %>
   </div>
-</nav>
+</header>

@@ -1,0 +1,33 @@
+name: Database backup
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 20 * * *"
+
+concurrency:
+  group: production-database-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --omit=dev
+      - name: Export database to private Supabase Storage
+        run: npm run backup:database
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          STORAGE_PROVIDER: supabase
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_PUBLIC_BUCKET: public-media
+          SUPABASE_PRIVATE_BUCKET: private-documents
+          SUPABASE_BACKUP_BUCKET: database-backups
+          BACKUP_RETENTION_DAYS: 30

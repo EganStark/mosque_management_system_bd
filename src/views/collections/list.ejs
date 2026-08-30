@@ -1,33 +1,17 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="mb-0">আদায় ব্যবস্থাপনা</h3>
-  <% if (currentUser.role !== 'viewer') { %><a href="/collections/new" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> নতুন আদায়</a><% } %>
+﻿<div class="d-flex justify-content-between align-items-center mb-3">
+  <div><h3 class="mb-1">আদায় ব্যবস্থাপনা</h3><p class="text-muted mb-0">সকল চাঁদা, দান ও অন্যান্য আয়ের রেকর্ড</p></div>
+  <% if (currentUser.role !== 'viewer') { %><a href="/collections/new" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> নতুন আদায়</a><% } %>
 </div>
-<div class="card"><div class="card-body"><div class="table-responsive">
-  <table class="table table-striped table-hover datatable w-100">
-    <thead><tr>
-      <th>ক্রমিক</th><th>নাম</th><th>উদ্দেশ্য</th><th>অ্যাকাউন্ট</th><th>বই নং</th><th>রশিদ নং</th><th>পরিমাণ</th><th>তারিখ</th><th class="no-print">অ্যাকশন</th>
-    </tr></thead>
-    <tbody>
-      <% rows.forEach(function(c, i){ %>
-      <tr>
-        <td><%= bn.toBnDigits(i+1) %></td>
-        <td><%= c.member_name || '' %> <small class="text-muted">(<%= bn.toBnDigits(c.member_id_no||'') %>)</small></td>
-        <td><%= c.purpose || '' %></td>
-        <td><%= c.account || '' %></td>
-        <td><%= bn.toBnDigits(c.book_no||'') %></td>
-        <td><%= bn.toBnDigits(c.receipt_no||'') %></td>
-        <td><%= bn.money(c.amount) %></td>
-        <td><%= bn.date(c.date) %></td>
-        <td class="no-print">
-          <% if (currentUser.role !== 'viewer') { %>
-          <form method="post" action="/collections/<%= c.id %>/delete" class="d-inline confirm-delete">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-          </form>
-          <% } %>
-        </td>
-      </tr>
-      <% }) %>
-    </tbody>
-  </table>
-</div></div></div>
+<div class="card"><div class="card-body"><div class="table-responsive"><table class="table table-hover datatable w-100">
+  <thead><tr><th>#</th><th>প্রদানকারী</th><th>খাত</th><th>রশিদ</th><th>পেমেন্ট</th><th>পরিমাণ</th><th>তারিখ</th><th>অবস্থা</th><th class="no-print">অ্যাকশন</th></tr></thead>
+  <tbody><% rows.forEach(function(c,i){ %><tr class="<%= c.status === 'cancelled' ? 'opacity-50' : '' %>">
+    <td><%= bn.toBnDigits(i+1) %></td>
+    <td><strong><%= c.member_name || c.payer_name || 'অজ্ঞাত প্রদানকারী' %></strong><% if(c.member_id_no){ %><small class="d-block text-muted">আইডি: <%= bn.toBnDigits(c.member_id_no) %></small><% } %></td>
+    <td><%= c.category_name || c.purpose || 'অন্যান্য' %></td>
+    <td><%= c.receipt_no ? bn.toBnDigits(c.receipt_no) : '—' %><% if(c.book_no){ %><small class="d-block text-muted">বই: <%= bn.toBnDigits(c.book_no) %></small><% } %></td>
+    <td><%= c.payment_method === 'bank' ? (c.bank_name || 'ব্যাংক') : (c.payment_method === 'mobile_banking' ? 'মোবাইল ব্যাংকিং' : 'নগদ') %></td>
+    <td class="fw-bold text-success">৳ <%= bn.money(c.amount) %></td><td><%= bn.date(c.date) %></td>
+    <td><span class="badge <%= c.status === 'cancelled' ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success' %>"><%= c.status === 'cancelled' ? 'বাতিল' : 'অনুমোদিত' %></span></td>
+    <td class="no-print"><div class="d-flex gap-1"><a href="/collections/<%= c.id %>/receipt" class="btn btn-sm btn-outline-primary" title="রশিদ"><i class="bi bi-receipt"></i></a><% if(currentUser.role === 'admin' && c.status !== 'cancelled'){ %><form method="post" action="/collections/<%= c.id %>/cancel" class="d-flex gap-1" onsubmit="return confirm('এই আদায়ের রেকর্ড বাতিল করবেন?')"><input type="hidden" name="_csrf" value="<%= csrfToken %>"/><input name="cancellation_reason" class="form-control form-control-sm" placeholder="বাতিলের কারণ" required/><button class="btn btn-sm btn-outline-danger" title="বাতিল"><i class="bi bi-x-circle"></i></button></form><% } %></div></td>
+  </tr><% }) %></tbody>
+</table></div></div></div>

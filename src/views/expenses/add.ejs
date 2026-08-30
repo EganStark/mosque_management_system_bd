@@ -1,25 +1,22 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="mb-0">নতুন খরচ</h3>
-  <a href="/expenses" class="btn btn-outline-secondary btn-sm"><i class="bi bi-list"></i> তালিকা</a>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div><p class="text-uppercase text-primary fw-bold small mb-1">Finance</p><h3 class="mb-1">নতুন খরচ</h3><p class="text-muted mb-0">ভাউচার ও পেমেন্ট উৎসসহ ব্যয়ের তথ্য রাখুন</p></div>
+  <a href="/expenses" class="btn btn-outline-secondary btn-sm"><i class="bi bi-list me-1"></i> তালিকা</a>
 </div>
-<div class="card"><div class="card-body">
-  <form method="post" action="/expenses" class="row g-3">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-    <div class="col-md-4"><label class="form-label">খরচের খাত</label>
-      <select name="expense_head_id" class="form-select select2">
-        <option value="">নির্বাচন করুন</option>
-        <% heads.forEach(function(h){ %><option value="<%= h.id %>"><%= h.name %></option><% }) %>
-      </select></div>
-    <div class="col-md-3"><label class="form-label required">পরিমাণ (টাকা)</label>
-      <input type="number" step="0.01" name="amount" class="form-control" required /></div>
-    <div class="col-md-3"><label class="form-label required">তারিখ</label>
-      <input type="text" name="date" class="form-control datepicker" value="<%= new Date().toISOString().slice(0,10) %>" required /></div>
-    <div class="col-md-2"><label class="form-label">পরিমাণ (একক)</label>
-      <input type="number" step="0.01" name="unit" class="form-control" /></div>
-    <div class="col-md-2"><label class="form-label">দর</label>
-      <input type="number" step="0.01" name="rate" class="form-control" /></div>
-    <div class="col-md-10"><label class="form-label">বিবরণ</label>
-      <input type="text" name="purpose" class="form-control" /></div>
-    <div class="col-12"><button class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> সংরক্ষণ</button></div>
-  </form>
-</div></div>
+<div class="card"><div class="card-body"><form method="post" action="/expenses" class="row g-3">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+  <div class="col-md-4"><label class="form-label required">খরচের খাত</label><select name="expense_head_id" class="form-select select2" required><option value="">নির্বাচন করুন</option><% heads.forEach(function(h){ %><option value="<%= h.id %>"><%= h.name %></option><% }) %></select></div>
+  <div class="col-md-4"><label class="form-label">যাকে প্রদান করা হয়েছে</label><input name="payee" class="form-control" /></div>
+  <div class="col-md-4"><label class="form-label">ভাউচার নম্বর</label><input name="voucher_no" class="form-control" /></div>
+  <div class="col-md-4"><label class="form-label required">পরিমাণ</label><div class="input-group"><span class="input-group-text">৳</span><input type="number" min="0.01" step="0.01" name="amount" class="form-control" required /></div></div>
+  <div class="col-md-4"><label class="form-label required">তারিখ</label><input type="text" name="date" class="form-control datepicker" value="<%= new Date().toISOString().slice(0,10) %>" required /></div>
+  <div class="col-md-4"><label class="form-label required">পেমেন্ট পদ্ধতি</label><select id="expensePaymentMethod" name="payment_method" class="form-select" required><option value="cash">নগদ</option><option value="bank">ব্যাংক</option><option value="mobile_banking">মোবাইল ব্যাংকিং</option></select></div>
+  <div class="col-md-4" id="expenseBankField" hidden><label class="form-label">ব্যাংক হিসাব</label><select name="bank_id" class="form-select"><option value="">নির্বাচন করুন</option><% banks.forEach(function(b){ %><option value="<%= b.id %>"><%= b.name %></option><% }) %></select></div>
+  <div class="col-md-4" id="expenseWalletField" hidden><label class="form-label">মোবাইল ওয়ালেট</label><select name="mobile_wallet_id" class="form-select"><option value="">নির্বাচন করুন</option><% wallets.forEach(function(w){ %><option value="<%= w.id %>"><%= w.name %><%= w.account_number?' — '+w.account_number:'' %></option><% }) %></select></div>
+  <div class="col-md-4"><label class="form-label">লেনদেন রেফারেন্স</label><input name="transaction_reference" class="form-control" /></div>
+  <div class="col-md-2"><label class="form-label">একক</label><input type="number" step="0.01" name="unit" class="form-control" /></div>
+  <div class="col-md-2"><label class="form-label">দর</label><input type="number" step="0.01" name="rate" class="form-control" /></div>
+  <div class="col-md-8"><label class="form-label">বিবরণ</label><input name="purpose" class="form-control" /></div>
+  <div class="col-md-4"><label class="form-label">মন্তব্য</label><input name="remarks" class="form-control" /></div>
+  <div class="col-12"><button class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> খরচ সংরক্ষণ</button></div>
+</form></div></div>
+<script>document.addEventListener('DOMContentLoaded',function(){var m=document.getElementById('expensePaymentMethod'),f=document.getElementById('expenseBankField'),w=document.getElementById('expenseWalletField');function sync(){f.hidden=m.value!=='bank';w.hidden=m.value!=='mobile_banking';}m.addEventListener('change',sync);sync();});</script>

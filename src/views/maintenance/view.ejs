@@ -1,0 +1,188 @@
+<div
+  class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4"
+>
+  <div>
+    <p class="text-uppercase text-primary fw-bold small mb-1">
+      <%= item.work_order_no %>
+    </p>
+    <h3 class="mb-1"><%= item.title %></h3>
+    <p class="text-muted mb-0">
+      <%= item.asset_name ? item.asset_code + ' - ' + item.asset_name : (item.facility_name || '') %>
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="/maintenance" class="btn btn-outline-secondary">সব কাজ</a
+    ><button onclick="window.print()" class="btn btn-outline-primary">
+      প্রিন্ট
+    </button>
+  </div>
+</div>
+<div class="row g-4 mb-4">
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header">কাজের বিবরণ</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">অবস্থা</dt>
+          <dd class="col-sm-8">
+            <strong
+              ><%= ({open:'খোলা',assigned:'দায়িত্ব দেওয়া',in_progress:'চলমান',completed:'সম্পন্ন',cancelled:'বাতিল'})[item.status] %></strong
+            >
+          </dd>
+          <dt class="col-sm-4">অগ্রাধিকার</dt>
+          <dd class="col-sm-8"><%= item.priority %></dd>
+          <dt class="col-sm-4">বিবরণ</dt>
+          <dd class="col-sm-8"><%= item.description %></dd>
+          <dt class="col-sm-4">দায়িত্বপ্রাপ্ত</dt>
+          <dd class="col-sm-8"><%= item.staff_name||'—' %></dd>
+          <dt class="col-sm-4">সেবাদাতা</dt>
+          <dd class="col-sm-8">
+            <%= item.vendor_name || '—' %> <%= item.vendor_phone ? ' · ' + item.vendor_phone : '' %>
+          </dd>
+          <dt class="col-sm-4">নির্ধারিত তারিখ</dt>
+          <dd class="col-sm-8">
+            <%= item.scheduled_date?bn.date(item.scheduled_date):'—' %>
+          </dd>
+          <dt class="col-sm-4">আনুমানিক খরচ</dt>
+          <dd class="col-sm-8">৳ <%= bn.money(item.estimated_cost) %></dd>
+          <dt class="col-sm-4">প্রকৃত খরচ</dt>
+          <dd class="col-sm-8">৳ <%= bn.money(item.actual_cost) %></dd>
+          <dt class="col-sm-4">সমাপ্তির নোট</dt>
+          <dd class="col-sm-8"><%= item.completion_notes||'—' %></dd>
+        </dl>
+        <% if(item.expense_id){ %><a
+          href="/expenses/<%= item.expense_id %>/voucher"
+          class="btn btn-sm btn-outline-primary mt-3"
+          >খরচের ভাউচার</a
+        ><% } %>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <% if(!['completed','cancelled'].includes(item.status)){ %>
+    <div class="card mb-4">
+      <div class="card-header">কাজের অবস্থা</div>
+      <div class="card-body">
+        <form
+          method="post"
+          action="/maintenance/<%= item.id %>/status"
+          class="d-flex gap-2"
+        >
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" /><select
+            name="status"
+            class="form-select"
+          >
+            <option value="open">খোলা</option>
+            <option value="assigned">দায়িত্ব দেওয়া</option>
+            <option value="in_progress">চলমান</option>
+            <option value="cancelled">বাতিল</option></select
+          ><button class="btn btn-outline-primary">আপডেট</button>
+        </form>
+      </div>
+    </div>
+    <% } %><%
+    if(currentUser.role!=='viewer'&&!['completed','cancelled'].includes(item.status)&&!(item.completionRequests||[]).some(function(r){return ['pending','processing'].includes(r.status)})){
+    %>
+    <div class="card">
+      <div class="card-header">কাজ সম্পন্ন করুন</div>
+      <div class="card-body">
+        <form
+          method="post"
+          action="/maintenance/<%= item.id %>/complete"
+          class="row g-3"
+        >
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div class="col-6">
+            <label class="form-label">সমাপ্তির তারিখ</label
+            ><input
+              type="date"
+              name="completed_date"
+              value="<%= new Date().toISOString().slice(0,10) %>"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="col-6">
+            <label class="form-label">প্রকৃত খরচ</label
+            ><input
+              type="number"
+              min="0"
+              step="0.01"
+              name="actual_cost"
+              value="<%= item.estimated_cost %>"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="col-6">
+            <label class="form-label">পেমেন্ট পদ্ধতি</label
+            ><select name="payment_method" class="form-select">
+              <option value="cash">নগদ</option>
+              <option value="bank">ব্যাংক</option>
+              <option value="mobile_banking">মোবাইল ব্যাংকিং</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label">সেবাদাতা/প্রাপক</label
+            ><input
+              name="payee"
+              value="<%= item.vendor_name||'' %>"
+              class="form-control"
+            />
+          </div>
+          <div class="col-12">
+            <label class="form-label">ব্যাংক হিসাব (শুধু ব্যাংক পেমেন্টে)</label>
+            <select name="bank_id" class="form-select">
+              <option value="">ব্যাংক নির্বাচন করুন</option>
+              <% banks.forEach(function(bank){ %>
+              <option value="<%= bank.id %>"><%= bank.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label">মোবাইল ওয়ালেট (শুধু মোবাইল পেমেন্টে)</label>
+            <select name="mobile_wallet_id" class="form-select">
+              <option value="">ওয়ালেট নির্বাচন করুন</option>
+              <% wallets.forEach(function(wallet){ %>
+              <option value="<%= wallet.id %>"><%= wallet.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label">লেনদেন রেফারেন্স</label
+            ><input name="reference" class="form-control" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">সমাপ্তির নোট</label
+            ><textarea
+              name="completion_notes"
+              class="form-control"
+              required
+            ></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">পরবর্তী সার্ভিস</label
+            ><input
+              type="date"
+              name="next_maintenance_date"
+              class="form-control"
+            />
+          </div>
+          <div class="col-12">
+            <button class="btn btn-success w-100">অনুমোদনের জন্য পাঠান</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</div>
+<div class="card mt-4">
+  <div class="card-header d-flex justify-content-between"><span>Completion authorization</span><span class="badge text-bg-light"><%= (item.completionRequests||[]).length %> requests</span></div>
+  <div class="card-body p-0"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Completion date</th><th>Actual cost</th><th>Requested by</th><th>Status</th><th></th></tr></thead><tbody>
+    <% (item.completionRequests||[]).forEach(function(request){ %><tr><td><%= bn.date(request.completed_date) %></td><td>৳ <%= bn.money(request.actual_cost) %></td><td><%= request.requester_name||'—' %><small class="d-block text-muted"><%= request.completion_notes||'' %></small></td><td><span class="badge <%= request.status==='approved'?'text-bg-success':request.status==='rejected'?'text-bg-danger':'text-bg-warning' %>"><%= request.status %></span></td><td>
+      <% if(currentUser.role==='admin'&&request.status==='pending'){ %><form method="post" action="/maintenance/<%= item.id %>/completion-requests/<%= request.id %>/decision" class="d-flex gap-2"><input type="hidden" name="_csrf" value="<%= csrfToken %>"/><input name="decision_notes" class="form-control form-control-sm" placeholder="Decision note"/><button name="decision" value="approved" class="btn btn-sm btn-success">Approve</button><button name="decision" value="rejected" class="btn btn-sm btn-outline-danger">Reject</button></form><% } %>
+    </td></tr><% }) %>
+    <% if(!(item.completionRequests||[]).length){ %><tr><td colspan="5" class="text-center text-muted py-4">No completion request submitted.</td></tr><% } %>
+  </tbody></table></div></div>
+</div>

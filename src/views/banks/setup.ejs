@@ -5,19 +5,22 @@
       <form method="post" action="/banks/setup">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <div class="mb-2"><label class="form-label required">ব্যাংকের নাম</label><input type="text" name="name" class="form-control" required /></div>
+        <div class="mb-2"><label class="form-label">হিসাব নম্বর</label><input type="text" name="account_number" class="form-control" /></div>
+        <div class="mb-2"><label class="form-label">শাখা</label><input type="text" name="branch_name" class="form-control" /></div>
+        <div class="row g-2 mb-2"><div class="col-6"><label class="form-label">প্রারম্ভিক ব্যালেন্স</label><input type="number" step="0.01" name="opening_balance" value="0" class="form-control" /></div><div class="col-6"><label class="form-label">ব্যালেন্সের তারিখ</label><input type="date" name="opening_balance_date" class="form-control" /></div></div>
         <button class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i> যুক্ত করুন</button>
       </form>
     </div></div>
   </div>
   <div class="col-md-8"><div class="card"><div class="card-body"><div class="table-responsive">
     <table class="table table-striped datatable w-100" data-buttons="false">
-      <thead><tr><th>ক্রমিক</th><th>নাম</th><th class="no-print">অ্যাকশন</th></tr></thead>
+      <thead><tr><th>ক্রমিক</th><th>নাম</th><th>অবস্থা</th><th class="no-print">অ্যাকশন</th></tr></thead>
       <tbody>
         <% rows.forEach(function(r,i){ %>
-        <tr><td><%= bn.toBnDigits(i+1) %></td><td><%= r.name %></td>
+        <tr class="<%= r.is_active?'':'text-muted' %>"><td><%= bn.toBnDigits(i+1) %></td><td><strong><%= r.name %></strong><small class="d-block"><%= r.account_number||'' %></small></td><td><span class="badge <%= r.is_active?'text-bg-success':'text-bg-secondary' %>"><%= r.is_active?'সক্রিয়':'নিষ্ক্রিয়' %></span></td>
           <td class="no-print">
-            <button class="btn btn-sm btn-outline-primary edit-row" data-action="/banks/setup/<%= r.id %>" data-fields='<%= JSON.stringify({name:r.name}) %>'><i class="bi bi-pencil"></i></button>
-            <form method="post" action="/banks/setup/<%= r.id %>/delete" class="d-inline confirm-delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+            <button class="btn btn-sm btn-outline-primary edit-row" data-action="/banks/setup/<%= r.id %>" data-fields='<%= JSON.stringify({name:r.name,account_number:r.account_number,branch_name:r.branch_name,opening_balance:r.opening_balance,opening_balance_date:r.opening_balance_date?String(r.opening_balance_date).slice(0,10):''}) %>'><i class="bi bi-pencil"></i></button>
+            <form method="post" action="/banks/setup/<%= r.id %>/status" class="d-inline"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><input type="hidden" name="is_active" value="<%= r.is_active?'false':'true' %>"/><button class="btn btn-sm <%= r.is_active?'btn-outline-danger':'btn-outline-success' %>" title="<%= r.is_active?'নিষ্ক্রিয় করুন':'সক্রিয় করুন' %>" onclick="return confirm('হিসাবটির অবস্থা পরিবর্তন করবেন?')"><i class="bi <%= r.is_active?'bi-archive':'bi-arrow-counterclockwise' %>"></i></button></form>
           </td>
         </tr>
         <% }) %>
@@ -29,7 +32,7 @@
 <div class="modal fade" id="editModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
   <form method="post" id="editForm"><input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     <div class="modal-header"><h5 class="modal-title">সম্পাদনা</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-    <div class="modal-body"><div class="mb-2"><label class="form-label">ব্যাংকের নাম</label><input type="text" name="name" class="form-control" /></div></div>
+    <div class="modal-body"><div class="mb-2"><label class="form-label">ব্যাংকের নাম</label><input type="text" name="name" class="form-control" /></div><div class="mb-2"><label class="form-label">হিসাব নম্বর</label><input name="account_number" class="form-control" /></div><div class="mb-2"><label class="form-label">শাখা</label><input name="branch_name" class="form-control" /></div><div class="mb-2"><label class="form-label">প্রারম্ভিক ব্যালেন্স</label><input type="number" step="0.01" name="opening_balance" class="form-control" /></div><div class="mb-2"><label class="form-label">তারিখ</label><input type="date" name="opening_balance_date" class="form-control" /></div></div>
     <div class="modal-footer"><button class="btn btn-primary">সংরক্ষণ</button></div>
   </form>
 </div></div></div>

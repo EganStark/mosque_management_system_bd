@@ -17,7 +17,15 @@
         <td class="no-print">
           <a href="/users/<%= u.id %>/edit" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
           <% if (u.id !== currentUser.id) { %>
-          <form method="post" action="/users/<%= u.id %>/delete" class="d-inline confirm-delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+          <form method="post" action="/users/<%= u.id %>/status" class="d-inline">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <input type="hidden" name="is_active" value="<%= u.is_active ? 'false' : 'true' %>" />
+            <button class="btn btn-sm btn-outline-<%= u.is_active ? 'warning' : 'success' %>"
+              title="<%= u.is_active ? 'অ্যাকাউন্ট নিষ্ক্রিয় করুন' : 'অ্যাকাউন্ট পুনরায় সক্রিয় করুন' %>"
+              onclick="return confirm('<%= u.is_active ? 'অ্যাকাউন্টটি নিষ্ক্রিয় করবেন? পূর্বের রেকর্ড সংরক্ষিত থাকবে।' : 'অ্যাকাউন্টটি পুনরায় সক্রিয় করবেন?' %>')">
+              <i class="bi bi-<%= u.is_active ? 'person-dash' : 'person-check' %>"></i>
+            </button>
+          </form>
           <% } %>
         </td>
       </tr>

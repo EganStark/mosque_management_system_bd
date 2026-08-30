@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { requireAuth, canWrite } = require('../middleware/auth');
-const { upload } = require('../middleware/upload');
+const { requireAuth, canWrite, adminOnly } = require('../middleware/auth');
+const { upload, uploadedPublicUrl } = require('../middleware/upload');
 const members = require('../services/members');
 const loc = require('../services/locations');
 
@@ -37,7 +37,7 @@ function collectChildren(body) {
 }
 
 function fileName(files, field) {
-  return files && files[field] && files[field][0] ? '/uploads/' + files[field][0].filename : undefined;
+  return files && files[field] && files[field][0] ? uploadedPublicUrl(files[field][0]) : undefined;
 }
 
 async function formData() {
@@ -77,10 +77,19 @@ router.get('/:id', async (req, res, next) => {
   try {
     const member = await members.findFull(req.params.id);
     if (!member) return res.status(404).render('error', { title: 'পাওয়া যায়নি', status: 404, message: 'সদস্য পাওয়া যায়নি।' });
-    res.render('members/view', { title: member.name, member });
+    const finance = await members.financialSummary(req.params.id);
+    res.render('members/view', { title: member.name, member, finance });
   } catch (err) {
     next(err);
   }
+});
+
+router.get('/:id/card', async (req, res, next) => {
+  try {
+    const member = await members.findFull(req.params.id);
+    if (!member) return res.status(404).render('error', { title: 'পাওয়া যায়নি', status: 404, message: 'সদস্য পাওয়া যায়নি।' });
+    res.render('members/card', { title: `${member.name} — সদস্য কার্ড`, member });
+  } catch (err) { next(err); }
 });
 
 // --- Edit form ---
@@ -147,16 +156,16 @@ router.post('/:id', canWrite, photoFields, async (req, res, next) => {
   }
 });
 
-// --- Delete ---
-router.post('/:id/delete', canWrite, async (req, res, next) => {
+// --- Archive / restore without destroying related history ---
+router.post('/:id/status', adminOnly, body('status').isIn(['active', 'deactive']), async (req, res) => {
   try {
-    await members.remove(req.params.id);
-    req.flash('success', 'সদস্য মুছে ফেলা হয়েছে।');
-    res.redirect('/members');
+    if (!validationResult(req).isEmpty()) throw new Error('সঠিক সদস্য অবস্থা নির্বাচন করুন।');
+    await members.setStatus(req.params.id, req.body.status, req.body.reason);
+    req.flash('success', req.body.status === 'active' ? 'সদস্যটি পুনরায় সক্রিয় হয়েছে।' : 'সদস্যটি আর্কাইভ হয়েছে; সকল ইতিহাস সংরক্ষিত আছে।');
   } catch (err) {
-    req.flash('error', 'মুছে ফেলা যায়নি — এই সদস্যের সাথে লেনদেন যুক্ত থাকতে পারে।');
-    res.redirect('/members');
+    req.flash('error', err.message);
   }
+  res.redirect('/members/' + req.params.id);
 });
 
 module.exports = router;

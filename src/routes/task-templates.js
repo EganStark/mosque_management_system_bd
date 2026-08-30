@@ -1,0 +1,11 @@
+const express = require('express'); const { body, validationResult } = require('express-validator');
+const { requireAuth, canWrite } = require('../middleware/auth'); const templates = require('../services/task-templates'); const tasks = require('../services/tasks');
+const router = express.Router(); router.use(requireAuth);
+const rules = [body('name').trim().notEmpty(), body('category').isIn(tasks.CATEGORIES), body('priority').isIn(tasks.PRIORITIES), body('default_duration_days').isInt({ min: 0, max: 365 })];
+router.get('/', async (req, res, next) => { try { const [rows, users] = await Promise.all([templates.list(), tasks.users()]); res.render('tasks/templates', { title: 'কাজের টেমপ্লেট', rows, users }); } catch (e) { next(e); } });
+router.post('/', canWrite, rules, async (req, res) => { try { if (!validationResult(req).isEmpty()) throw new Error('সঠিক টেমপ্লেট তথ্য দিন'); await templates.create(req.body, req.session.user.id); req.flash('success', 'কাজের টেমপ্লেট তৈরি হয়েছে।'); } catch (e) { req.flash('error', e.message); } res.redirect('/task-templates'); });
+router.get('/:id/edit', async (req, res, next) => { try { const [item, users] = await Promise.all([templates.find(req.params.id), tasks.users()]); if (!item) return res.redirect('/task-templates'); res.render('tasks/template-edit', { title: item.name, item, users }); } catch (e) { next(e); } });
+router.post('/:id/edit', canWrite, rules, async (req, res) => { try { if (!validationResult(req).isEmpty()) throw new Error('সঠিক টেমপ্লেট তথ্য দিন'); await templates.update(req.params.id, req.body); req.flash('success', 'টেমপ্লেট হালনাগাদ হয়েছে।'); } catch (e) { req.flash('error', e.message); } res.redirect(`/task-templates/${req.params.id}/edit`); });
+router.post('/:id/use', canWrite, async (req, res) => { try { const task = await templates.instantiate(req.params.id, req.body, req.session.user.id); req.flash('success', 'টেমপ্লেট থেকে নতুন কাজ তৈরি হয়েছে।'); return res.redirect(`/tasks/${task.id}`); } catch (e) { req.flash('error', e.message); return res.redirect('/task-templates'); } });
+router.post('/:id/archive', canWrite, async (req, res) => { try { await templates.archive(req.params.id); req.flash('success', 'টেমপ্লেট আর্কাইভ হয়েছে।'); } catch (e) { req.flash('error', e.message); } res.redirect('/task-templates'); });
+module.exports = router;
