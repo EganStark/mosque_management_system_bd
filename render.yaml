@@ -46,6 +46,8 @@ services:
         value: demo@example.invalid
       - key: DEMO_PASSWORD
         sync: false
+      - key: DEMO_DATA_ENABLED
+        value: "true"
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY

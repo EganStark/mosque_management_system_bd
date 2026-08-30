@@ -991,6 +991,7 @@ describe('Request security', () => {
       DEMO_MODE: 'true',
       DEMO_USERNAME: 'portfolio-demo',
       DEMO_PASSWORD: 'PublicDemoPassword@2026',
+      DEMO_DATA_ENABLED: 'true',
       SMS_GATEWAY_ENABLED: 'false',
     })).toBe(true);
   });

@@ -83,6 +83,13 @@ function validateProductionEnvironment(env = process.env) {
       errors.push('DEMO_PASSWORD must be a non-placeholder value of at least 12 characters');
     }
   }
+  if (env.DEMO_DATA_ENABLED && !['true', 'false'].includes(String(env.DEMO_DATA_ENABLED).toLowerCase())) {
+    errors.push('DEMO_DATA_ENABLED must be true or false');
+  }
+  if (String(env.DEMO_DATA_ENABLED || '').toLowerCase() === 'true'
+    && String(env.DEMO_MODE || '').toLowerCase() !== 'true') {
+    errors.push('DEMO_DATA_ENABLED requires DEMO_MODE=true');
+  }
 
   if (errors.length) throw new Error(`Invalid production environment:\n- ${errors.join('\n- ')}`);
   return true;

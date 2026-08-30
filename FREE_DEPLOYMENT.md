@@ -25,6 +25,8 @@ Use a new administrator password. Do not deploy with `ChangeMe@123`, `Admin@2026
 
 For the public portfolio login, also supply unique `DEMO_USERNAME` and `DEMO_PASSWORD` values. `DEMO_MODE=true` creates a dedicated `demo` role with broad read visibility, while the server rejects every state-changing request from that account. Never publish the private administrator credentials.
 
+The Blueprint also sets `DEMO_DATA_ENABLED=true`. Each deployment safely creates or refreshes the same clearly marked fictional members, finances, events, programs, staff, assets, inventory, welfare request, and tasks without duplicating them. Keep this disabled for any real installation.
+
 ## 3. Vercel landing page
 
 1. Import the same GitHub repository into Vercel.

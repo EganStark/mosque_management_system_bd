@@ -201,6 +201,7 @@ The complete safe template is available in [.env.example](.env.example).
 | `STORAGE_PROVIDER` | `local` or `supabase` |
 | `DEMO_MODE` | Enables the hardened public portfolio account |
 | `DEMO_USERNAME` / `DEMO_PASSWORD` | Separate public read-only demo credentials |
+| `DEMO_DATA_ENABLED` | Seeds an idempotent, entirely fictional portfolio dataset |
 
 Supabase variables are required only when `STORAGE_PROVIDER=supabase`. Service-role credentials must remain server-side and must never use a `VITE_` prefix.
 
@@ -302,7 +303,7 @@ See [FREE_DEPLOYMENT.md](FREE_DEPLOYMENT.md) for the complete deployment guide. 
 
 ## Roadmap
 
-- Resettable fictional demonstration dataset
+- One-command fictional demonstration-data reset tooling
 - Production screenshots and live portfolio links
 - Installation-level branding wizard
 - Automated browser and accessibility testing
