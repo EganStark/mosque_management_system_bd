@@ -60,5 +60,7 @@ services:
         value: database-backups
       - key: BACKUP_RETENTION_DAYS
         value: "30"
+      - key: BACKUP_TRIGGER_SECRET
+        sync: false
       - key: SMS_GATEWAY_ENABLED
         value: "false"

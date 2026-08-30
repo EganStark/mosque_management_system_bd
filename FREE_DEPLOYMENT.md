@@ -39,7 +39,7 @@ The Blueprint also sets `DEMO_DATA_ENABLED=true`. Each deployment safely creates
 
 Add these GitHub Actions repository secrets:
 
-- `MOSQUE_BACKUP_DB_PASSWORD` (password for the dedicated read-only `mosque_backup` PostgreSQL role)
+- `BACKUP_TRIGGER_SECRET` (the same independent 32+ character secret configured in Render)
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
 

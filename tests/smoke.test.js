@@ -947,6 +947,34 @@ describe('Request security', () => {
     expect(response.body).toEqual({ status: 'ok', database: 'ready' });
   });
 
+  test('automated backup trigger is unavailable without a configured machine secret', async () => {
+    const previous = process.env.BACKUP_TRIGGER_SECRET;
+    delete process.env.BACKUP_TRIGGER_SECRET;
+    try {
+      const response = await request(app).post('/internal/backups/run');
+      expect(response.status).toBe(503);
+      expect(response.body.error).toBe('Automated backup trigger is not configured');
+    } finally {
+      if (previous === undefined) delete process.env.BACKUP_TRIGGER_SECRET;
+      else process.env.BACKUP_TRIGGER_SECRET = previous;
+    }
+  });
+
+  test('automated backup trigger rejects an invalid bearer secret', async () => {
+    const previous = process.env.BACKUP_TRIGGER_SECRET;
+    process.env.BACKUP_TRIGGER_SECRET = 'server-backup-secret-0123456789abcdef';
+    try {
+      const response = await request(app)
+        .post('/internal/backups/run')
+        .set('Authorization', 'Bearer incorrect-backup-secret');
+      expect(response.status).toBe(401);
+      expect(response.body.error).toBe('Unauthorized');
+    } finally {
+      if (previous === undefined) delete process.env.BACKUP_TRIGGER_SECRET;
+      else process.env.BACKUP_TRIGGER_SECRET = previous;
+    }
+  });
+
   test('production environment validation rejects placeholders and accepts secure configuration', () => {
     expect(() => validateProductionEnvironment({
       SESSION_SECRET: 'change-this-to-a-long-random-string',

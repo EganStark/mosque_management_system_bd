@@ -49,6 +49,10 @@ app.get('/healthz', async (_req, res) => {
   }
 });
 
+// Machine-to-machine maintenance endpoints use their own bearer secret and
+// intentionally run before browser sessions and CSRF middleware.
+app.use('/internal', require('./routes/internal'));
+
 // Public API for the landing page. Keep this before session/CSRF middleware so
 // cross-origin React requests can read public data and submit public forms.
 app.use('/api', require('./routes/api'));
