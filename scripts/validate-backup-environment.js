@@ -14,7 +14,7 @@ if (missing.length) {
   process.exit(1);
 }
 
-if (process.env.PGUSER !== 'postgres.azdqiwvsxkgftslfvqrw') {
+if (process.env.PGUSER !== 'mosque_backup.azdqiwvsxkgftslfvqrw') {
   console.error('Backup database username does not match the Supabase session pooler user.');
   process.exit(1);
 }

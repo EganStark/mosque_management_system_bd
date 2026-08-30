@@ -39,7 +39,7 @@ The Blueprint also sets `DEMO_DATA_ENABLED=true`. Each deployment safely creates
 
 Add these GitHub Actions repository secrets:
 
-- `SUPABASE_DB_PASSWORD` (database password only; the workflow supplies the non-secret pooler host and username)
+- `MOSQUE_BACKUP_DB_PASSWORD` (password for the dedicated read-only `mosque_backup` PostgreSQL role)
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
 
