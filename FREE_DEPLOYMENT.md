@@ -23,6 +23,8 @@ This layout keeps the landing page fast and allows the existing Express admin to
 
 Use a new administrator password. Do not deploy with `ChangeMe@123`, `Admin@2026`, or `admin`.
 
+For the public portfolio login, also supply unique `DEMO_USERNAME` and `DEMO_PASSWORD` values. `DEMO_MODE=true` creates a dedicated `demo` role with broad read visibility, while the server rejects every state-changing request from that account. Never publish the private administrator credentials.
+
 ## 3. Vercel landing page
 
 1. Import the same GitHub repository into Vercel.

@@ -14,6 +14,7 @@ const { helmetMiddleware, csrfProtection } = require('./middleware/security');
 const { locals } = require('./middleware/locals');
 const { permissionGuard, auditLogger } = require('./middleware/governance');
 const { refreshAuthenticatedUser } = require('./middleware/auth');
+const { demoReadOnly } = require('./middleware/demo-mode');
 
 const app = express();
 
@@ -79,6 +80,7 @@ app.use(refreshAuthenticatedUser);
 
 // --- Shared view locals ---
 app.use(locals);
+app.use(demoReadOnly);
 app.use(permissionGuard);
 app.use(auditLogger);
 

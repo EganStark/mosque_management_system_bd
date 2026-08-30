@@ -72,6 +72,17 @@ function validateProductionEnvironment(env = process.env) {
     else parseUrl('SMS_GATEWAY_URL', env.SMS_GATEWAY_URL, ['https:'], errors);
     if (!env.SMS_GATEWAY_TOKEN) errors.push('SMS_GATEWAY_TOKEN is required when SMS is enabled');
   }
+  if (String(env.DEMO_MODE || '').toLowerCase() === 'true') {
+    if (!env.DEMO_USERNAME || String(env.DEMO_USERNAME).trim().length < 3) {
+      errors.push('DEMO_USERNAME must contain at least 3 characters when demo mode is enabled');
+    }
+    if (String(env.DEMO_USERNAME || '').toLowerCase() === String(env.ADMIN_USERNAME || '').toLowerCase()) {
+      errors.push('DEMO_USERNAME must be different from ADMIN_USERNAME');
+    }
+    if (!env.DEMO_PASSWORD || env.DEMO_PASSWORD.length < 12 || isPlaceholder(env.DEMO_PASSWORD)) {
+      errors.push('DEMO_PASSWORD must be a non-placeholder value of at least 12 characters');
+    }
+  }
 
   if (errors.length) throw new Error(`Invalid production environment:\n- ${errors.join('\n- ')}`);
   return true;

@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const security = require('../services/security');
+const { isDemoUser } = require('./demo-mode');
 
 const RULES = [
   { test: /^\/members/, permission: 'members.manage' },
@@ -35,7 +36,7 @@ async function permissionGuard(req, res, next) {
   const user = req.session && req.session.user;
   if (!user || req.method === 'OPTIONS') return next();
   const rule = RULES.find((item) => item.test.test(req.path));
-  if (!rule || await security.allowed(user.role, rule.permission)) return next();
+  if (!rule || isDemoUser(user) || await security.allowed(user.role, rule.permission)) return next();
   db('audit_logs').insert({ user_id: user.id, username: user.username, role: user.role, method: req.method, path: req.originalUrl.split('?')[0], action: 'access_denied', entity: req.path.split('/').filter(Boolean)[0] || 'route', status_code: 403, ip_address: req.ip, user_agent: req.get('user-agent') || null, changes: { required_permission: rule.permission } }).catch((err) => console.error('Authorization audit write failed:', err.message));
   if (req.accepts('json') && !req.accepts('html')) return res.status(403).json({ error: 'Forbidden', permission: rule.permission });
   return res.status(403).render('error', { title: 'অনুমতি নেই', status: 403, message: 'এই কাজটি করার অনুমতি আপনার ভূমিকায় দেওয়া নেই।' });
@@ -76,7 +77,7 @@ function requirePermission(permission) {
   return async (req, res, next) => {
     const user = req.session && req.session.user;
     if (!user) return res.redirect('/login');
-    if (await security.allowed(user.role, permission)) return next();
+    if (isDemoUser(user) || await security.allowed(user.role, permission)) return next();
     db('audit_logs').insert({ user_id: user.id, username: user.username, role: user.role, method: req.method, path: req.originalUrl.split('?')[0], action: 'access_denied', entity: 'landing', status_code: 403, ip_address: req.ip, user_agent: req.get('user-agent') || null, changes: { required_permission: permission } }).catch((err) => console.error('Authorization audit write failed:', err.message));
     return res.status(403).render('error', { title: 'অনুমতি নেই', status: 403, message: 'কনটেন্ট প্রকাশের অনুমতি আপনার নেই। একজন অনুমোদিত প্রকাশকের পর্যালোচনা প্রয়োজন।' });
   };

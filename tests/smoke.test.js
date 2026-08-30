@@ -987,6 +987,10 @@ describe('Request security', () => {
       SUPABASE_PUBLIC_BUCKET: 'public-media',
       SUPABASE_PRIVATE_BUCKET: 'private-documents',
       SUPABASE_BACKUP_BUCKET: 'database-backups',
+      ADMIN_USERNAME: 'private-owner',
+      DEMO_MODE: 'true',
+      DEMO_USERNAME: 'portfolio-demo',
+      DEMO_PASSWORD: 'PublicDemoPassword@2026',
       SMS_GATEWAY_ENABLED: 'false',
     })).toBe(true);
   });
@@ -995,6 +999,52 @@ describe('Request security', () => {
     const res = await agent.post('/collections').type('form').send({ amount: 10, date: '2026-07-21', payment_method: 'cash' });
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe('/dashboard');
+  });
+
+  test('public demo account can browse admin modules but cannot change data', async () => {
+    const username = `demo_${Date.now()}`;
+    const password = 'SafeDemoPassword@2026';
+    const previous = {
+      mode: process.env.DEMO_MODE,
+      username: process.env.DEMO_USERNAME,
+    };
+    try {
+      await users.create({
+        name: 'Read-only Demo',
+        username,
+        email: `${username}@example.invalid`,
+        password,
+        role: 'demo',
+      });
+      process.env.DEMO_MODE = 'true';
+      process.env.DEMO_USERNAME = username;
+
+      const agent = await loginAs(username, password);
+      const membersPage = await agent.get('/members');
+      expect(membersPage.status).toBe(200);
+      expect(membersPage.text).toContain('Demo mode:');
+
+      const blocked = await agent
+        .post('/settings')
+        .type('form')
+        .send({ _csrf: extractCsrf(membersPage.text), company_name: 'Must not be saved' });
+      expect(blocked.status).toBe(403);
+      expect(blocked.text).toContain('read-only');
+
+      const logout = await agent
+        .post('/logout')
+        .type('form')
+        .send({ _csrf: extractCsrf(blocked.text) });
+      expect(logout.status).toBe(302);
+      expect(logout.headers.location).toBe('/login');
+    } finally {
+      if (previous.mode === undefined) delete process.env.DEMO_MODE;
+      else process.env.DEMO_MODE = previous.mode;
+      if (previous.username === undefined) delete process.env.DEMO_USERNAME;
+      else process.env.DEMO_USERNAME = previous.username;
+      await db('audit_logs').where({ username }).del();
+      await db('users').where({ username }).del();
+    }
   });
 
   test('public API does not grant CORS to an untrusted origin', async () => {

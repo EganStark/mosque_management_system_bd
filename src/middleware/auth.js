@@ -1,5 +1,6 @@
 // Authentication & role-based access control middleware.
 const db = require('../config/db');
+const { isDemoUser } = require('./demo-mode');
 
 async function refreshAuthenticatedUser(req, res, next) {
   const sessionUser = req.session && req.session.user;
@@ -53,6 +54,7 @@ function requireRole(roles) {
       return res.redirect('/login');
     }
     if (allowed.includes(user.role)) return next();
+    if (['GET', 'HEAD', 'OPTIONS'].includes(req.method) && isDemoUser(user)) return next();
     return res.status(403).render('error', {
       title: 'প্রবেশাধিকার নেই',
       status: 403,

@@ -36,6 +36,16 @@ services:
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
+      - key: DEMO_MODE
+        value: "true"
+      - key: DEMO_NAME
+        value: Demo Administrator
+      - key: DEMO_USERNAME
+        sync: false
+      - key: DEMO_EMAIL
+        value: demo@example.invalid
+      - key: DEMO_PASSWORD
+        sync: false
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY

@@ -6,7 +6,7 @@ The application supports Bangla and English, responsive desktop/mobile layouts, 
 
 ## Project status
 
-This repository is an actively developed portfolio and demonstration project. Its current automated verification includes 63 backend integration tests, production environment validation, and a successful TanStack Start production build.
+This repository is an actively developed portfolio and demonstration project. Its current automated verification includes 64 backend integration tests, production environment validation, and a successful TanStack Start production build.
 
 Live demonstration links will be added after the portfolio deployment is complete.
 
@@ -167,6 +167,9 @@ Open the URL printed by Vite, normally <http://localhost:5173>.
 | `ADMIN_USERNAME` | Initial administrator username |
 | `ADMIN_EMAIL` | Initial administrator email |
 | `ADMIN_PASSWORD` | Initial administrator password |
+| `DEMO_MODE` | Enables the hardened read-only portfolio account when set to `true` |
+| `DEMO_USERNAME` | Username that receives full-module read-only demo access |
+| `DEMO_PASSWORD` | Separate password for the public demo account |
 | `LANDING_PAGE_ORIGIN` | Allowed public website origin or comma-separated origins |
 | `LANDING_PAGE_URL` | Public website URL shown inside the dashboard |
 | `STORAGE_PROVIDER` | `local` or `supabase` |
@@ -257,7 +260,7 @@ tests/              Jest and Supertest integration tests
 
 ## Roadmap
 
-- Hardened, resettable public demo mode
+- Resettable fictional demonstration dataset
 - Installation-level branding wizard
 - Additional automated browser and accessibility tests
 - Expanded notification gateway integrations

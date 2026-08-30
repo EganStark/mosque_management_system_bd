@@ -6,6 +6,7 @@ const { generateCsrfToken } = require('./security');
 const notificationsService = require('../services/notifications');
 const securityService = require('../services/security');
 const approvalsService = require('../services/approvals');
+const { isDemoUser } = require('./demo-mode');
 
 let cachedSettings = null;
 let cachedAt = 0;
@@ -26,6 +27,7 @@ function invalidateSettingsCache() {
 
 async function locals(req, res, next) {
   res.locals.currentUser = req.session && req.session.user ? req.session.user : null;
+  res.locals.isDemoSession = isDemoUser(res.locals.currentUser);
   res.locals.flash = {
     success: req.flash('success'),
     error: req.flash('error'),
@@ -49,10 +51,13 @@ async function locals(req, res, next) {
   if (res.locals.currentUser) {
     try {
       const permissionKeys = securityService.PERMISSIONS.map((item) => item.key);
+      const demoSession = isDemoUser(res.locals.currentUser);
       const [notifications, permissionValues] = await Promise.all([
         notificationsService.list(res.locals.currentUser, 4),
-        Promise.all(permissionKeys.map((permission) =>
-          securityService.allowed(res.locals.currentUser.role, permission))),
+        demoSession
+          ? Promise.resolve(permissionKeys.map(() => true))
+          : Promise.all(permissionKeys.map((permission) =>
+            securityService.allowed(res.locals.currentUser.role, permission))),
       ]);
       res.locals.navNotifications = notifications;
       res.locals.navCapabilities = Object.fromEntries(
