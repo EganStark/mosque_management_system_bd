@@ -1,0 +1,12 @@
+node_modules/
+.env
+.claude/
+src/public/uploads/*
+!src/public/uploads/.gitkeep
+.playwright-mcp/
+npm-debug.log*
+coverage/
+*.log
+
+# Local-only analysis of the reference site (contains third-party credentials/PII)
+SITE_FUNCTIONALITY_REPORT.md

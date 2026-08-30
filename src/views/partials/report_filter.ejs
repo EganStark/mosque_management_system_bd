@@ -1,0 +1,11 @@
+<div class="card mb-3 no-print"><div class="card-body">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-3"><label class="form-label">শুরুর তারিখ</label><input type="text" name="from" class="form-control datepicker" value="<%= from || '' %>" /></div>
+    <div class="col-md-3"><label class="form-label">শেষ তারিখ</label><input type="text" name="to" class="form-control datepicker" value="<%= to || '' %>" /></div>
+    <%- typeof extraFilter !== 'undefined' ? extraFilter : '' %>
+    <div class="col-md-3">
+      <button class="btn btn-primary"><i class="bi bi-search me-1"></i> খুঁজুন</button>
+      <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="bi bi-printer"></i> প্রিন্ট</button>
+    </div>
+  </form>
+</div></div>

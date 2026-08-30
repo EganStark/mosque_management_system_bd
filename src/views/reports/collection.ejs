@@ -1,0 +1,29 @@
+<h3 class="mb-3">আদায় রিপোর্ট</h3>
+<%- include('../partials/report_filter', { from, to, extraFilter: '' }) %>
+
+<div class="card"><div class="card-body">
+  <div class="report-header text-center mb-2">
+    <h5 class="mb-0"><%= company.company_name %></h5>
+    <div class="small text-muted">আদায় রিপোর্ট<%= from? ' ('+bn.date(from)+' - '+bn.date(to||from)+')':'' %></div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-sm table-bordered datatable w-100">
+      <thead><tr><th>ক্রমিক</th><th>আইডি</th><th>নাম</th><th>উদ্দেশ্য</th><th>বই নং</th><th>রশিদ নং</th><th>তারিখ</th><th class="text-end">পরিমাণ</th></tr></thead>
+      <tbody>
+        <% rows.forEach(function(c,i){ %>
+        <tr>
+          <td><%= bn.toBnDigits(i+1) %></td>
+          <td><%= bn.toBnDigits(c.member_id_no||'') %></td>
+          <td><%= c.member_name||'' %></td>
+          <td><%= c.purpose||'' %></td>
+          <td><%= bn.toBnDigits(c.book_no||'') %></td>
+          <td><%= bn.toBnDigits(c.receipt_no||'') %></td>
+          <td><%= bn.date(c.date) %></td>
+          <td class="text-end"><%= bn.money(c.amount) %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+      <tfoot><tr class="fw-bold"><td colspan="7" class="text-end">সর্বমোট</td><td class="text-end"><%= bn.money(total) %></td></tr></tfoot>
+    </table>
+  </div>
+</div></div>

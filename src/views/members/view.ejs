@@ -1,0 +1,63 @@
+<%
+  function row(label, value){ return value ? '<tr><th class="w-25">'+label+'</th><td>'+value+'</td></tr>' : ''; }
+%>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><%= member.name %> <small class="text-muted">(<%= bn.toBnDigits(member.id_no) %>)</small></h3>
+  <div class="no-print">
+    <% if (currentUser.role !== 'viewer') { %><a href="/members/<%= member.id %>/edit" class="btn btn-primary btn-sm"><i class="bi bi-pencil"></i> সম্পাদনা</a><% } %>
+    <button onclick="window.print()" class="btn btn-outline-secondary btn-sm"><i class="bi bi-printer"></i> প্রিন্ট</button>
+    <a href="/members" class="btn btn-light btn-sm">ফিরে যান</a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-3 text-center">
+    <% if (member.photo) { %><img src="<%= member.photo %>" class="img-fluid rounded shadow-sm" style="max-height:220px" /><% } else { %><i class="bi bi-person-circle" style="font-size:8rem;color:#ccc"></i><% } %>
+    <div class="mt-2"><span class="badge bg-<%= member.status==='active'?'success':'secondary' %>"><%= member.status==='active'?'সক্রিয়':'নিষ্ক্রিয়' %></span></div>
+  </div>
+  <div class="col-md-9">
+    <div class="card"><div class="card-header">মূল তথ্য</div><div class="card-body p-0"><table class="table table-sm mb-0">
+      <%- row('মোবাইল', bn.toBnDigits(member.phone||'')) %>
+      <%- row('অন্যান্য মোবাইল', bn.toBnDigits(member.other_phones||'')) %>
+      <%- row('লিঙ্গ', member.gender==='female'?'মহিলা':'পুরুষ') %>
+      <%- row('পেশা', member.occupation_name) %>
+      <%- row('জন্ম তারিখ', bn.date(member.birth_date)) %>
+      <%- row('রেফারেন্স', member.reference_name ? (bn.toBnDigits(member.reference_id_no||'')+' - '+member.reference_name) : '') %>
+      <%- row('মাসিক পরিশোধ', member.monthly_payment ? ('হ্যাঁ ('+bn.money(member.monthly_payment_amount)+')') : 'না') %>
+    </table></div></div>
+  </div>
+</div>
+
+<div class="card mt-3"><div class="card-header">ঠিকানা</div><div class="card-body p-0"><table class="table table-sm mb-0">
+  <%- row('বিভাগ', member.division_name) %>
+  <%- row('জেলা', member.district_name) %>
+  <%- row('থানা', member.thana_name) %>
+  <%- row('পোস্ট অফিস', member.post_office_name) %>
+  <%- row('গ্রাম', member.village_name) %>
+  <%- row('এলাকা', member.area_name) %>
+  <%- row('পোস্ট কোড', bn.toBnDigits(member.post_code||'')) %>
+  <%- row('বিস্তারিত', member.address_text) %>
+</table></div></div>
+
+<div class="row g-3 mt-0">
+  <div class="col-md-6"><div class="card h-100"><div class="card-header">পারিবারিক তথ্য</div><div class="card-body p-0"><table class="table table-sm mb-0">
+    <%- row('স্ত্রী', member.wife_name) %>
+    <%- row('স্বামী', member.husband_name) %>
+    <%- row('পিতা', member.father_name) %>
+    <%- row('মাতা', member.mother_name) %>
+    <%- row('দাদা', member.grandfather_name) %>
+    <%- row('দাদী', member.grandmother_name) %>
+  </table></div></div></div>
+  <div class="col-md-6"><div class="card h-100"><div class="card-header">সন্তান</div><div class="card-body">
+    <% if (member.children && member.children.length) { %>
+      <ul class="list-group list-group-flush">
+      <% member.children.forEach(function(c){ %>
+        <li class="list-group-item d-flex justify-content-between">
+          <span><%= c.name %></span>
+          <span class="badge bg-light text-dark"><%= c.type==='son'?'ছেলে':'মেয়ে' %></span>
+        </li>
+      <% }) %>
+      </ul>
+    <% } else { %><span class="text-muted">কোন তথ্য নেই</span><% } %>
+  </div></div></div>
+</div>

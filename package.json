@@ -1,0 +1,47 @@
+{
+  "name": "baitur-rahman-admin",
+  "version": "1.0.0",
+  "description": "Admin panel for Baitur Rahman Jame Mosjid (members, collections, expenses, bank, reports)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "migrate": "knex migrate:latest",
+    "migrate:rollback": "knex migrate:rollback",
+    "seed": "knex seed:run",
+    "db:setup": "node scripts/create-db.js",
+    "test": "cross-env NODE_ENV=test jest --runInBand --forceExit"
+  },
+  "keywords": [
+    "mosque",
+    "admin",
+    "express",
+    "postgres"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "connect-flash": "^0.1.1",
+    "connect-pg-simple": "^9.0.1",
+    "cookie-parser": "^1.4.6",
+    "csrf-csrf": "^3.0.6",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-rate-limit": "^7.4.0",
+    "express-session": "^1.18.0",
+    "express-validator": "^7.2.0",
+    "helmet": "^7.1.0",
+    "knex": "^3.1.0",
+    "multer": "^2.1.1",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.4",
+    "supertest": "^7.0.0"
+  }
+}

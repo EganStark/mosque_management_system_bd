@@ -1,0 +1,40 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">সকল সদস্য</h3>
+  <% if (currentUser.role !== 'viewer') { %>
+  <a href="/members/new" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i> নতুন সদস্য</a>
+  <% } %>
+</div>
+<div class="card"><div class="card-body">
+  <div class="table-responsive">
+    <table class="table table-striped table-hover datatable w-100">
+      <thead>
+        <tr>
+          <th>ক্রমিক</th><th>ছবি</th><th>আইডি</th><th>নাম</th><th>ঠিকানা</th><th>মোবাইল</th><th>পেশা</th><th class="no-print">অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.forEach(function(m, i){ %>
+        <tr>
+          <td><%= bn.toBnDigits(i+1) %></td>
+          <td><img class="member-photo" src="<%= m.photo || '/static/img/avatar.png' %>" alt="" onerror="this.style.visibility='hidden'" /></td>
+          <td><%= bn.toBnDigits(m.id_no) %></td>
+          <td><%= m.name %></td>
+          <td><%= m.address_text || '' %></td>
+          <td><%= bn.toBnDigits(m.phone || '') %></td>
+          <td><%= m.occupation || '' %></td>
+          <td class="no-print">
+            <a href="/members/<%= m.id %>" class="btn btn-sm btn-outline-info" title="বিস্তারিত"><i class="bi bi-eye"></i></a>
+            <% if (currentUser.role !== 'viewer') { %>
+            <a href="/members/<%= m.id %>/edit" class="btn btn-sm btn-outline-primary" title="সম্পাদনা"><i class="bi bi-pencil"></i></a>
+            <form method="post" action="/members/<%= m.id %>/delete" class="d-inline confirm-delete">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button class="btn btn-sm btn-outline-danger" title="মুছুন"><i class="bi bi-trash"></i></button>
+            </form>
+            <% } %>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div></div>

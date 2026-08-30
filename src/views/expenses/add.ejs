@@ -1,0 +1,25 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">নতুন খরচ</h3>
+  <a href="/expenses" class="btn btn-outline-secondary btn-sm"><i class="bi bi-list"></i> তালিকা</a>
+</div>
+<div class="card"><div class="card-body">
+  <form method="post" action="/expenses" class="row g-3">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <div class="col-md-4"><label class="form-label">খরচের খাত</label>
+      <select name="expense_head_id" class="form-select select2">
+        <option value="">নির্বাচন করুন</option>
+        <% heads.forEach(function(h){ %><option value="<%= h.id %>"><%= h.name %></option><% }) %>
+      </select></div>
+    <div class="col-md-3"><label class="form-label required">পরিমাণ (টাকা)</label>
+      <input type="number" step="0.01" name="amount" class="form-control" required /></div>
+    <div class="col-md-3"><label class="form-label required">তারিখ</label>
+      <input type="text" name="date" class="form-control datepicker" value="<%= new Date().toISOString().slice(0,10) %>" required /></div>
+    <div class="col-md-2"><label class="form-label">পরিমাণ (একক)</label>
+      <input type="number" step="0.01" name="unit" class="form-control" /></div>
+    <div class="col-md-2"><label class="form-label">দর</label>
+      <input type="number" step="0.01" name="rate" class="form-control" /></div>
+    <div class="col-md-10"><label class="form-label">বিবরণ</label>
+      <input type="text" name="purpose" class="form-control" /></div>
+    <div class="col-12"><button class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> সংরক্ষণ</button></div>
+  </form>
+</div></div>

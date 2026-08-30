@@ -1,0 +1,16 @@
+<% if (flash && flash.success && flash.success.length) { %>
+  <% flash.success.forEach(function(msg){ %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="bi bi-check-circle me-1"></i><%= msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  <% }) %>
+<% } %>
+<% if (flash && flash.error && flash.error.length) { %>
+  <% flash.error.forEach(function(msg){ %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="bi bi-exclamation-triangle me-1"></i><%= msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  <% }) %>
+<% } %>

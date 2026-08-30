@@ -1,0 +1,34 @@
+<h3 class="mb-3">লাভ ও ক্ষতি</h3>
+<%- include('../partials/report_filter', { from, to, extraFilter: '' }) %>
+
+<div class="card"><div class="card-body">
+  <div class="report-header text-center mb-2">
+    <h5 class="mb-0"><%= company.company_name %></h5>
+    <div class="small text-muted">লাভ ও ক্ষতি<%= from? ' ('+bn.date(from)+' - '+bn.date(to||from)+')':'' %></div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-sm table-bordered w-100">
+      <thead><tr><th>ক্রমিক</th><th>সদস্য</th><th>টাইপ</th><th>উদ্দেশ্য</th><th class="text-end">আয়</th><th class="text-end">খরচ</th><th>তারিখ</th></tr></thead>
+      <tbody>
+        <% if (from) { %>
+        <tr class="table-light"><td colspan="4" class="text-end fw-bold">পূর্ববর্তী জের</td><td class="text-end" colspan="2"><%= bn.money(data.prevBalance) %></td><td></td></tr>
+        <% } %>
+        <% data.rows.forEach(function(r,i){ %>
+        <tr>
+          <td><%= bn.toBnDigits(i+1) %></td>
+          <td><%= r.member||'' %></td>
+          <td><%= r.type %></td>
+          <td><%= r.purpose||'' %></td>
+          <td class="text-end text-success"><%= r.income? bn.money(r.income):'' %></td>
+          <td class="text-end text-danger"><%= r.expense? bn.money(r.expense):'' %></td>
+          <td><%= bn.date(r.date) %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+      <tfoot>
+        <tr class="fw-bold"><td colspan="4" class="text-end">উপমোট</td><td class="text-end"><%= bn.money(data.subtotalIncome) %></td><td class="text-end"><%= bn.money(data.subtotalExpense) %></td><td></td></tr>
+        <tr class="fw-bold table-primary"><td colspan="4" class="text-end">সর্বমোট অবশিষ্ট</td><td class="text-end" colspan="2"><%= bn.money(data.total) %></td><td></td></tr>
+      </tfoot>
+    </table>
+  </div>
+</div></div>

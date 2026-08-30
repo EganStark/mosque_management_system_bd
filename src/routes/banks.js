@@ -1,0 +1,96 @@
+const express = require('express');
+const { body, validationResult } = require('express-validator');
+const { requireAuth, canWrite, adminOnly } = require('../middleware/auth');
+const banks = require('../services/banks');
+
+const router = express.Router();
+router.use(requireAuth);
+
+// --- Bank setup (admin) ---
+router.get('/setup', adminOnly, async (req, res, next) => {
+  try {
+    res.render('banks/setup', { title: 'ব্যাংক সেটআপ', rows: await banks.banks.all() });
+  } catch (err) { next(err); }
+});
+
+router.post('/setup', adminOnly, async (req, res, next) => {
+  try {
+    await banks.banks.create(req.body.name);
+    req.flash('success', 'ব্যাংক যুক্ত হয়েছে।');
+    res.redirect('/banks/setup');
+  } catch (err) { next(err); }
+});
+
+router.post('/setup/:id', adminOnly, async (req, res, next) => {
+  try {
+    await banks.banks.update(req.params.id, req.body.name);
+    req.flash('success', 'হালনাগাদ হয়েছে।');
+    res.redirect('/banks/setup');
+  } catch (err) { next(err); }
+});
+
+router.post('/setup/:id/delete', adminOnly, async (req, res, next) => {
+  try {
+    await banks.banks.remove(req.params.id);
+    req.flash('success', 'মুছে ফেলা হয়েছে।');
+    res.redirect('/banks/setup');
+  } catch (err) {
+    req.flash('error', 'মুছে ফেলা যায়নি।');
+    res.redirect('/banks/setup');
+  }
+});
+
+// --- Transactions ledger ---
+router.get('/', async (req, res, next) => {
+  try {
+    res.render('banks/list', { title: 'ব্যাংক লেনদেন', rows: await banks.transactions.list() });
+  } catch (err) { next(err); }
+});
+
+// --- Deposit / Withdraw form (type via query: deposit | withdraw) ---
+router.get('/transaction', canWrite, async (req, res, next) => {
+  try {
+    const type = req.query.type === 'withdraw' ? 'withdraw' : 'deposit';
+    res.render('banks/transaction', { title: type === 'deposit' ? 'ব্যাংক জমা' : 'ব্যাংক উত্তোলন', type, bankList: await banks.banks.all() });
+  } catch (err) { next(err); }
+});
+
+router.post(
+  '/transaction',
+  canWrite,
+  body('bank_id').notEmpty(),
+  body('amount').isFloat({ gt: 0 }),
+  body('date').notEmpty(),
+  async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        req.flash('error', 'ব্যাংক, পরিমাণ ও তারিখ সঠিকভাবে দিন।');
+        return res.redirect('/banks/transaction?type=' + (req.body.type || 'deposit'));
+      }
+      const b = req.body;
+      await banks.transactions.create({
+        bank_id: b.bank_id,
+        type: b.type === 'withdraw' ? 'withdraw' : 'deposit',
+        amount: b.amount,
+        cheque_number: b.cheque_number || null,
+        payment_method: b.payment_method || null,
+        remarks: b.remarks || null,
+        date: b.date,
+        created_by: req.session.user.id,
+      });
+      req.flash('success', 'লেনদেন যুক্ত হয়েছে।');
+      res.redirect('/banks');
+    } catch (err) { next(err); }
+  }
+);
+
+router.post('/:id/delete', canWrite, async (req, res, next) => {
+  try {
+    await banks.transactions.remove(req.params.id);
+    req.flash('success', 'মুছে ফেলা হয়েছে।');
+    res.redirect('/banks');
+  } catch (err) { next(err); }
+});
+
+module.exports = router;

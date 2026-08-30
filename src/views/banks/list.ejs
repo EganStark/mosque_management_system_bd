@@ -1,0 +1,33 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">ব্যাংক লেনদেন</h3>
+  <% if (currentUser.role !== 'viewer') { %>
+  <div>
+    <a href="/banks/transaction?type=deposit" class="btn btn-success btn-sm"><i class="bi bi-arrow-down-circle me-1"></i> জমা</a>
+    <a href="/banks/transaction?type=withdraw" class="btn btn-danger btn-sm"><i class="bi bi-arrow-up-circle me-1"></i> উত্তোলন</a>
+    <% if (currentUser.role === 'admin') { %><a href="/banks/setup" class="btn btn-outline-secondary btn-sm"><i class="bi bi-gear me-1"></i> ব্যাংক সেটআপ</a><% } %>
+  </div>
+  <% } %>
+</div>
+<div class="card"><div class="card-body"><div class="table-responsive">
+  <table class="table table-striped table-hover datatable w-100">
+    <thead><tr><th>ক্রমিক</th><th>ব্যাংক</th><th>ধরন</th><th>মন্তব্য</th><th>জমা</th><th>উত্তোলন</th><th>তারিখ</th><th class="no-print">অ্যাকশন</th></tr></thead>
+    <tbody>
+      <% rows.forEach(function(t,i){ %>
+      <tr>
+        <td><%= bn.toBnDigits(i+1) %></td>
+        <td><%= t.bank_name||'' %></td>
+        <td><span class="badge bg-<%= t.type==='deposit'?'success':'danger' %>"><%= t.type==='deposit'?'জমা':'উত্তোলন' %></span></td>
+        <td><%= t.remarks||'' %></td>
+        <td><%= t.type==='deposit'? bn.money(t.amount) : '' %></td>
+        <td><%= t.type==='withdraw'? bn.money(t.amount) : '' %></td>
+        <td><%= bn.date(t.date) %></td>
+        <td class="no-print">
+          <% if (currentUser.role !== 'viewer') { %>
+          <form method="post" action="/banks/<%= t.id %>/delete" class="d-inline confirm-delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+          <% } %>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div></div></div>

@@ -1,0 +1,35 @@
+<h3 class="mb-3">ব্যাংক সেটআপ</h3>
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card"><div class="card-header">নতুন ব্যাংক</div><div class="card-body">
+      <form method="post" action="/banks/setup">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <div class="mb-2"><label class="form-label required">ব্যাংকের নাম</label><input type="text" name="name" class="form-control" required /></div>
+        <button class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i> যুক্ত করুন</button>
+      </form>
+    </div></div>
+  </div>
+  <div class="col-md-8"><div class="card"><div class="card-body"><div class="table-responsive">
+    <table class="table table-striped datatable w-100" data-buttons="false">
+      <thead><tr><th>ক্রমিক</th><th>নাম</th><th class="no-print">অ্যাকশন</th></tr></thead>
+      <tbody>
+        <% rows.forEach(function(r,i){ %>
+        <tr><td><%= bn.toBnDigits(i+1) %></td><td><%= r.name %></td>
+          <td class="no-print">
+            <button class="btn btn-sm btn-outline-primary edit-row" data-action="/banks/setup/<%= r.id %>" data-fields='<%= JSON.stringify({name:r.name}) %>'><i class="bi bi-pencil"></i></button>
+            <form method="post" action="/banks/setup/<%= r.id %>/delete" class="d-inline confirm-delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div></div></div></div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+  <form method="post" id="editForm"><input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <div class="modal-header"><h5 class="modal-title">সম্পাদনা</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body"><div class="mb-2"><label class="form-label">ব্যাংকের নাম</label><input type="text" name="name" class="form-control" /></div></div>
+    <div class="modal-footer"><button class="btn btn-primary">সংরক্ষণ</button></div>
+  </form>
+</div></div></div>

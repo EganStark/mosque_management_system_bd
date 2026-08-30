@@ -1,0 +1,82 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">ড্যাশবোর্ড</h3>
+  <span class="text-muted"><%= bn.monthLabel(stats.month) %></span>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card stat-card border-start border-success border-4 h-100">
+      <div class="card-body">
+        <div class="text-muted small">চলতি মাসের আদায়</div>
+        <div class="h4 mb-0 text-success">৳ <%= bn.money(stats.monthCollection) %></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card border-start border-danger border-4 h-100">
+      <div class="card-body">
+        <div class="text-muted small">চলতি মাসের খরচ</div>
+        <div class="h4 mb-0 text-danger">৳ <%= bn.money(stats.monthExpense) %></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card border-start border-primary border-4 h-100">
+      <div class="card-body">
+        <div class="text-muted small">চলতি মাসের অবশিষ্ট</div>
+        <div class="h4 mb-0 text-primary">৳ <%= bn.money(stats.monthBalance) %></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">সর্বমোট হিসাব</div>
+  <div class="card-body">
+    <div class="row text-center">
+      <div class="col-md-4">
+        <div class="text-muted small">মোট আদায়</div>
+        <div class="h5 text-success">৳ <%= bn.money(stats.totalCollection) %></div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-muted small">মোট খরচ</div>
+        <div class="h5 text-danger">৳ <%= bn.money(stats.totalExpense) %></div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-muted small">অবশিষ্ট</div>
+        <div class="h5 text-primary">৳ <%= bn.money(stats.totalBalance) %></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-6 col-md-3">
+    <div class="card text-center h-100"><div class="card-body">
+      <i class="bi bi-people fs-2 text-primary"></i>
+      <div class="h4 mb-0"><%= bn.num(memberCounts.total) %></div>
+      <div class="text-muted small">মোট সদস্য</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-center h-100"><div class="card-body">
+      <i class="bi bi-person-check fs-2 text-success"></i>
+      <div class="h4 mb-0"><%= bn.num(memberCounts.active) %></div>
+      <div class="text-muted small">সক্রিয় সদস্য</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-center h-100"><div class="card-body">
+      <i class="bi bi-gender-male fs-2 text-info"></i>
+      <div class="h4 mb-0"><%= bn.num(memberCounts.male) %></div>
+      <div class="text-muted small">পুরুষ</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-center h-100"><div class="card-body">
+      <i class="bi bi-gender-female fs-2 text-danger"></i>
+      <div class="h4 mb-0"><%= bn.num(memberCounts.female) %></div>
+      <div class="text-muted small">মহিলা</div>
+    </div></div>
+  </div>
+</div>

@@ -1,0 +1,201 @@
+<%
+  var isEdit = !!member;
+  var action = (isEdit ? '/members/' + member.id : '/members') + '?_csrf=' + encodeURIComponent(csrfToken);
+  function val(f){ return member && member[f] != null ? member[f] : ''; }
+  function dval(f){ var v = member && member[f]; return v ? String(v).slice(0,10) : ''; }
+  function sel(f, v){ return member && String(member[f]) === String(v) ? 'selected' : ''; }
+%>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><%= title %></h3>
+  <a href="/members" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> ফিরে যান</a>
+</div>
+
+<form method="post" action="<%= action %>" enctype="multipart/form-data">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+  <!-- Basic info -->
+  <div class="card mb-3"><div class="card-header">মূল তথ্য</div><div class="card-body row g-3">
+    <div class="col-md-4"><label class="form-label required">নাম</label>
+      <input type="text" name="name" class="form-control" value="<%= val('name') %>" required /></div>
+    <div class="col-md-2"><label class="form-label">আইডি নং</label>
+      <input type="text" name="id_no" class="form-control" value="<%= isEdit ? val('id_no') : nextId %>" /></div>
+    <div class="col-md-3"><label class="form-label required">মোবাইল</label>
+      <input type="text" name="phone" class="form-control" value="<%= val('phone') %>" /></div>
+    <div class="col-md-3"><label class="form-label">অন্যান্য মোবাইল</label>
+      <input type="text" name="other_phones" class="form-control" value="<%= val('other_phones') %>" /></div>
+
+    <div class="col-md-3"><label class="form-label">পেশা</label>
+      <select name="occupation_id" class="form-select select2">
+        <option value="">নির্বাচন করুন</option>
+        <% occupations.forEach(function(o){ %><option value="<%= o.id %>" <%= sel('occupation_id', o.id) %>><%= o.name %></option><% }) %>
+      </select></div>
+    <div class="col-md-3"><label class="form-label">পেশার বিবরণ</label>
+      <input type="text" name="occupation_section" class="form-control" value="<%= val('occupation_section') %>" /></div>
+    <div class="col-md-2"><label class="form-label">লিঙ্গ</label>
+      <select name="gender" class="form-select">
+        <option value="male" <%= sel('gender','male') %>>পুরুষ</option>
+        <option value="female" <%= sel('gender','female') %>>মহিলা</option>
+      </select></div>
+    <div class="col-md-2"><label class="form-label">অবস্থা</label>
+      <select name="status" class="form-select">
+        <option value="active" <%= sel('status','active') %>>সক্রিয়</option>
+        <option value="deactive" <%= sel('status','deactive') %>>নিষ্ক্রিয়</option>
+      </select></div>
+    <div class="col-md-2"><label class="form-label">জন্ম তারিখ</label>
+      <input type="text" name="birth_date" class="form-control datepicker" value="<%= dval('birth_date') %>" /></div>
+    <div class="col-md-4"><label class="form-label">ছবি</label>
+      <input type="file" name="photo" class="form-control" accept="image/*" />
+      <% if (val('photo')) { %><img src="<%= val('photo') %>" class="mt-2 member-photo" /><% } %>
+    </div>
+    <div class="col-md-4"><label class="form-label">রেফারেন্স</label>
+      <select name="reference_member_id" class="form-select select2">
+        <option value="">নির্বাচন করুন</option>
+        <% memberOptions.forEach(function(o){ if(!isEdit || o.id !== member.id){ %>
+          <option value="<%= o.id %>" <%= sel('reference_member_id', o.id) %>><%= o.id_no %> - <%= o.name %></option>
+        <% } }) %>
+      </select></div>
+  </div></div>
+
+  <!-- Address -->
+  <div class="card mb-3"><div class="card-header">ঠিকানা</div><div class="card-body row g-3">
+    <div class="col-md-4"><label class="form-label">বিভাগ</label>
+      <select id="addr_division" name="division_id" class="form-select">
+        <option value="">নির্বাচন করুন</option>
+        <% divisions.forEach(function(d){ %><option value="<%= d.id %>" <%= sel('division_id', d.id) %>><%= d.name %></option><% }) %>
+      </select></div>
+    <div class="col-md-4"><label class="form-label">জেলা</label>
+      <select id="addr_district" name="district_id" class="form-select">
+        <option value="">নির্বাচন করুন</option>
+        <% (typeof districts!=='undefined'?districts:[]).forEach(function(d){ %><option value="<%= d.id %>" <%= sel('district_id', d.id) %>><%= d.name %></option><% }) %>
+      </select></div>
+    <div class="col-md-4"><label class="form-label">থানা</label>
+      <select id="addr_thana" name="thana_id" class="form-select">
+        <option value="">নির্বাচন করুন</option>
+        <% (typeof thanas!=='undefined'?thanas:[]).forEach(function(d){ %><option value="<%= d.id %>" <%= sel('thana_id', d.id) %>><%= d.name %></option><% }) %>
+      </select></div>
+    <div class="col-md-4"><label class="form-label">পোস্ট অফিস</label>
+      <select id="addr_post_office" name="post_office_id" class="form-select">
+        <option value="">নির্বাচন করুন</option>
+        <% (typeof postOffices!=='undefined'?postOffices:[]).forEach(function(d){ %><option value="<%= d.id %>" <%= sel('post_office_id', d.id) %>><%= d.name %></option><% }) %>
+      </select></div>
+    <div class="col-md-4"><label class="form-label">গ্রাম</label>
+      <select id="addr_village" name="village_id" class="form-select">
+        <option value="">নির্বাচন করুন</option>
+        <% (typeof villages!=='undefined'?villages:[]).forEach(function(d){ %><option value="<%= d.id %>" <%= sel('village_id', d.id) %>><%= d.name %></option><% }) %>
+      </select></div>
+    <div class="col-md-4"><label class="form-label">এলাকা</label>
+      <select id="addr_area" name="area_id" class="form-select">
+        <option value="">নির্বাচন করুন</option>
+        <% (typeof areas!=='undefined'?areas:[]).forEach(function(d){ %><option value="<%= d.id %>" <%= sel('area_id', d.id) %>><%= d.name %></option><% }) %>
+      </select></div>
+    <div class="col-md-3"><label class="form-label">পোস্ট কোড</label>
+      <input type="text" id="post_code" name="post_code" class="form-control" value="<%= val('post_code') %>" /></div>
+    <div class="col-md-9"><label class="form-label">বিস্তারিত ঠিকানা</label>
+      <input type="text" name="address_text" class="form-control" value="<%= val('address_text') %>" /></div>
+  </div></div>
+
+  <!-- Spouse -->
+  <div class="card mb-3"><div class="card-header">স্বামী / স্ত্রী</div><div class="card-body row g-3">
+    <div class="col-md-3"><label class="form-label">স্ত্রীর নাম</label><input type="text" name="wife_name" class="form-control" value="<%= val('wife_name') %>" /></div>
+    <div class="col-md-3"><label class="form-label">স্ত্রীর মৃত্যু তারিখ</label><input type="text" name="wife_die_date" class="form-control datepicker" value="<%= dval('wife_die_date') %>" /></div>
+    <div class="col-md-3"><label class="form-label">স্বামীর নাম</label><input type="text" name="husband_name" class="form-control" value="<%= val('husband_name') %>" /></div>
+    <div class="col-md-3"><label class="form-label">স্বামীর মৃত্যু তারিখ</label><input type="text" name="husband_die_date" class="form-control datepicker" value="<%= dval('husband_die_date') %>" /></div>
+    <div class="col-md-4"><label class="form-label">ছবি</label><input type="file" name="spouse_photo" class="form-control" accept="image/*" /></div>
+  </div></div>
+
+  <!-- Parents -->
+  <div class="card mb-3"><div class="card-header">পিতা-মাতা</div><div class="card-body row g-3">
+    <div class="col-md-4"><label class="form-label">পিতার নাম</label><input type="text" name="father_name" class="form-control" value="<%= val('father_name') %>" /></div>
+    <div class="col-md-2"><label class="form-label">জন্ম তারিখ</label><input type="text" name="father_birth_date" class="form-control datepicker" value="<%= dval('father_birth_date') %>" /></div>
+    <div class="col-md-2"><label class="form-label">মৃত্যু তারিখ</label><input type="text" name="father_die_date" class="form-control datepicker" value="<%= dval('father_die_date') %>" /></div>
+    <div class="col-md-4"><label class="form-label">পিতার ছবি</label><input type="file" name="father_photo" class="form-control" accept="image/*" /></div>
+    <div class="col-md-4"><label class="form-label">মাতার নাম</label><input type="text" name="mother_name" class="form-control" value="<%= val('mother_name') %>" /></div>
+    <div class="col-md-2"><label class="form-label">জন্ম তারিখ</label><input type="text" name="mother_birth_date" class="form-control datepicker" value="<%= dval('mother_birth_date') %>" /></div>
+    <div class="col-md-2"><label class="form-label">মৃত্যু তারিখ</label><input type="text" name="mother_die_date" class="form-control datepicker" value="<%= dval('mother_die_date') %>" /></div>
+    <div class="col-md-4"><label class="form-label">মাতার ছবি</label><input type="file" name="mother_photo" class="form-control" accept="image/*" /></div>
+  </div></div>
+
+  <!-- Grandparents -->
+  <div class="card mb-3"><div class="card-header">দাদা-দাদী</div><div class="card-body row g-3">
+    <div class="col-md-3"><label class="form-label">দাদার নাম</label><input type="text" name="grandfather_name" class="form-control" value="<%= val('grandfather_name') %>" /></div>
+    <div class="col-md-3"><label class="form-label">মৃত্যু তারিখ</label><input type="text" name="grandfather_die_date" class="form-control datepicker" value="<%= dval('grandfather_die_date') %>" /></div>
+    <div class="col-md-3"><label class="form-label">দাদীর নাম</label><input type="text" name="grandmother_name" class="form-control" value="<%= val('grandmother_name') %>" /></div>
+    <div class="col-md-3"><label class="form-label">মৃত্যু তারিখ</label><input type="text" name="grandmother_die_date" class="form-control datepicker" value="<%= dval('grandmother_die_date') %>" /></div>
+  </div></div>
+
+  <!-- Children -->
+  <div class="card mb-3"><div class="card-header d-flex justify-content-between align-items-center">
+    <span>সন্তান</span>
+  </div><div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="d-flex justify-content-between align-items-center mb-2"><strong>ছেলে</strong>
+          <button type="button" class="btn btn-sm btn-outline-success add-child" data-type="son"><i class="bi bi-plus"></i> যোগ</button></div>
+        <div id="children-son">
+          <% (children||[]).filter(c=>c.type==='son').forEach(function(c){ %>
+          <div class="child-row row g-2 align-items-end">
+            <div class="col-2"><input type="text" name="son_sl" class="form-control form-control-sm" placeholder="ক্রম" value="<%= c.sl||'' %>" /></div>
+            <div class="col-4"><input type="text" name="son_name" class="form-control form-control-sm" placeholder="নাম" value="<%= c.name||'' %>" /></div>
+            <div class="col-3"><input type="text" name="son_birth_date" class="form-control form-control-sm datepicker" placeholder="জন্ম" value="<%= c.birth_date?String(c.birth_date).slice(0,10):'' %>" /></div>
+            <div class="col-2"><input type="text" name="son_die_date" class="form-control form-control-sm datepicker" placeholder="মৃত্যু" value="<%= c.die_date?String(c.die_date).slice(0,10):'' %>" /></div>
+            <div class="col-1"><button type="button" class="btn btn-sm btn-outline-danger remove-child"><i class="bi bi-x"></i></button></div>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="d-flex justify-content-between align-items-center mb-2"><strong>মেয়ে</strong>
+          <button type="button" class="btn btn-sm btn-outline-success add-child" data-type="daughter"><i class="bi bi-plus"></i> যোগ</button></div>
+        <div id="children-daughter">
+          <% (children||[]).filter(c=>c.type==='daughter').forEach(function(c){ %>
+          <div class="child-row row g-2 align-items-end">
+            <div class="col-2"><input type="text" name="daughter_sl" class="form-control form-control-sm" placeholder="ক্রম" value="<%= c.sl||'' %>" /></div>
+            <div class="col-4"><input type="text" name="daughter_name" class="form-control form-control-sm" placeholder="নাম" value="<%= c.name||'' %>" /></div>
+            <div class="col-3"><input type="text" name="daughter_birth_date" class="form-control form-control-sm datepicker" placeholder="জন্ম" value="<%= c.birth_date?String(c.birth_date).slice(0,10):'' %>" /></div>
+            <div class="col-2"><input type="text" name="daughter_die_date" class="form-control form-control-sm datepicker" placeholder="মৃত্যু" value="<%= c.die_date?String(c.die_date).slice(0,10):'' %>" /></div>
+            <div class="col-1"><button type="button" class="btn btn-sm btn-outline-danger remove-child"><i class="bi bi-x"></i></button></div>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+  </div></div>
+
+  <!-- Monthly payment -->
+  <div class="card mb-3"><div class="card-header">মাসিক পরিশোধ</div><div class="card-body row g-3">
+    <div class="col-md-3"><label class="form-label">মাসিক পরিশোধ</label>
+      <select name="monthly_payment" class="form-select">
+        <option value="false" <%= member && !member.monthly_payment ? 'selected':'' %>>না</option>
+        <option value="true" <%= member && member.monthly_payment ? 'selected':'' %>>হ্যাঁ</option>
+      </select></div>
+    <div class="col-md-3"><label class="form-label">মাসিক পরিমাণ</label>
+      <input type="number" step="0.01" name="monthly_payment_amount" class="form-control" value="<%= val('monthly_payment_amount') %>" /></div>
+    <div class="col-md-3"><label class="form-label">মৃত্যু তারিখ</label>
+      <input type="text" name="die_date" class="form-control datepicker" value="<%= dval('die_date') %>" /></div>
+  </div></div>
+
+  <div class="mb-5">
+    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i> সংরক্ষণ করুন</button>
+    <a href="/members" class="btn btn-light">বাতিল</a>
+  </div>
+</form>
+
+<!-- Templates for new child rows -->
+<template id="tpl-son">
+  <div class="child-row row g-2 align-items-end">
+    <div class="col-2"><input type="text" name="son_sl" class="form-control form-control-sm" placeholder="ক্রম" /></div>
+    <div class="col-4"><input type="text" name="son_name" class="form-control form-control-sm" placeholder="নাম" /></div>
+    <div class="col-3"><input type="text" name="son_birth_date" class="form-control form-control-sm datepicker" placeholder="জন্ম" /></div>
+    <div class="col-2"><input type="text" name="son_die_date" class="form-control form-control-sm datepicker" placeholder="মৃত্যু" /></div>
+    <div class="col-1"><button type="button" class="btn btn-sm btn-outline-danger remove-child"><i class="bi bi-x"></i></button></div>
+  </div>
+</template>
+<template id="tpl-daughter">
+  <div class="child-row row g-2 align-items-end">
+    <div class="col-2"><input type="text" name="daughter_sl" class="form-control form-control-sm" placeholder="ক্রম" /></div>
+    <div class="col-4"><input type="text" name="daughter_name" class="form-control form-control-sm" placeholder="নাম" /></div>
+    <div class="col-3"><input type="text" name="daughter_birth_date" class="form-control form-control-sm datepicker" placeholder="জন্ম" /></div>
+    <div class="col-2"><input type="text" name="daughter_die_date" class="form-control form-control-sm datepicker" placeholder="মৃত্যু" /></div>
+    <div class="col-1"><button type="button" class="btn btn-sm btn-outline-danger remove-child"><i class="bi bi-x"></i></button></div>
+  </div>
+</template>

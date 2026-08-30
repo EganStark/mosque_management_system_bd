@@ -1,0 +1,27 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">ব্যবহারকারী</h3>
+  <a href="/users/new" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i> নতুন ব্যবহারকারী</a>
+</div>
+<div class="card"><div class="card-body"><div class="table-responsive">
+  <table class="table table-striped datatable w-100" data-buttons="false">
+    <thead><tr><th>ক্রমিক</th><th>নাম</th><th>ইউজারনেম</th><th>ইমেইল</th><th>ভূমিকা</th><th>অবস্থা</th><th class="no-print">অ্যাকশন</th></tr></thead>
+    <tbody>
+      <% users.forEach(function(u,i){ %>
+      <tr>
+        <td><%= bn.toBnDigits(i+1) %></td>
+        <td><%= u.name %></td>
+        <td><%= u.username %></td>
+        <td><%= u.email||'' %></td>
+        <td><span class="badge bg-secondary"><%= u.role %></span></td>
+        <td><span class="badge bg-<%= u.is_active?'success':'secondary' %>"><%= u.is_active?'সক্রিয়':'নিষ্ক্রিয়' %></span></td>
+        <td class="no-print">
+          <a href="/users/<%= u.id %>/edit" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+          <% if (u.id !== currentUser.id) { %>
+          <form method="post" action="/users/<%= u.id %>/delete" class="d-inline confirm-delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+          <% } %>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div></div></div>

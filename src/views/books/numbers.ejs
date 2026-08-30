@@ -1,0 +1,41 @@
+<h3 class="mb-3">বই নম্বর</h3>
+<div class="card mb-3"><div class="card-header">নতুন বই নম্বর</div><div class="card-body">
+  <form method="post" action="/books/numbers" class="row g-3">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <div class="col-md-3"><label class="form-label">বই</label>
+      <select name="book_type_id" class="form-select select2"><option value="">নির্বাচন করুন</option>
+        <% bookTypes.forEach(function(b){ %><option value="<%= b.id %>"><%= b.name %></option><% }) %></select></div>
+    <div class="col-md-2"><label class="form-label required">বই নম্বর</label><input type="text" name="book_number" class="form-control" required /></div>
+    <div class="col-md-2"><label class="form-label">রশিদ হতে</label><input type="text" name="receipt_from" class="form-control" /></div>
+    <div class="col-md-2"><label class="form-label">রশিদ পর্যন্ত</label><input type="text" name="receipt_to" class="form-control" /></div>
+    <div class="col-md-3"><label class="form-label">কালেক্টর</label>
+      <select name="collector_id" class="form-select select2"><option value="">নির্বাচন করুন</option>
+        <% collectors.forEach(function(u){ %><option value="<%= u.id %>"><%= u.name %></option><% }) %></select></div>
+    <div class="col-md-2"><label class="form-label">ইস্যু তারিখ</label><input type="text" name="issue_date" class="form-control datepicker" /></div>
+    <div class="col-md-2"><label class="form-label">অবস্থা</label>
+      <select name="status" class="form-select"><option value="active">সক্রিয়</option><option value="deactive">নিষ্ক্রিয়</option></select></div>
+    <div class="col-md-2 d-flex align-items-end"><button class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i> যুক্ত</button></div>
+  </form>
+</div></div>
+
+<div class="card"><div class="card-body"><div class="table-responsive">
+  <table class="table table-striped datatable w-100" data-buttons="false">
+    <thead><tr><th>ক্রমিক</th><th>বই</th><th>নম্বর</th><th>রশিদ</th><th>কালেক্টর</th><th>ইস্যু তারিখ</th><th>অবস্থা</th><th class="no-print">অ্যাকশন</th></tr></thead>
+    <tbody>
+      <% rows.forEach(function(r,i){ %>
+      <tr>
+        <td><%= bn.toBnDigits(i+1) %></td>
+        <td><%= r.book_type_name||'' %></td>
+        <td><%= bn.toBnDigits(r.book_number) %></td>
+        <td><%= bn.toBnDigits(r.receipt_from||'') %><%= r.receipt_to ? ' - '+bn.toBnDigits(r.receipt_to) : '' %></td>
+        <td><%= r.collector_name||'' %></td>
+        <td><%= bn.date(r.issue_date) %></td>
+        <td><span class="badge bg-<%= r.status==='active'?'success':'secondary' %>"><%= r.status==='active'?'সক্রিয়':'নিষ্ক্রিয়' %></span></td>
+        <td class="no-print">
+          <form method="post" action="/books/numbers/<%= r.id %>/delete" class="d-inline confirm-delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div></div></div>

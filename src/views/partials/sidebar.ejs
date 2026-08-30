@@ -1,0 +1,53 @@
+<%
+  function active(prefix) { return activePath && activePath.indexOf(prefix) === 0 ? 'active' : ''; }
+  var role = currentUser ? currentUser.role : 'viewer';
+  var isAdmin = role === 'admin';
+%>
+<nav id="sidebar" class="sidebar">
+  <div class="sidebar-brand">
+    <i class="bi bi-moon-stars-fill me-2"></i>
+    <span><%= company && company.company_name ? company.company_name : 'বায়তুর রহমান' %></span>
+  </div>
+  <ul class="nav flex-column">
+    <li><a class="nav-link <%= active('/dashboard') %>" href="/dashboard"><i class="bi bi-speedometer2"></i> ড্যাশবোর্ড</a></li>
+
+    <li class="nav-section">সদস্য</li>
+    <li><a class="nav-link <%= active('/members') %>" href="/members"><i class="bi bi-people"></i> সদস্য তালিকা</a></li>
+    <% if (role !== 'viewer') { %>
+    <li><a class="nav-link" href="/members/new"><i class="bi bi-person-plus"></i> নতুন সদস্য</a></li>
+    <% } %>
+
+    <li class="nav-section">আর্থিক</li>
+    <li><a class="nav-link <%= active('/collections') %>" href="/collections"><i class="bi bi-cash-coin"></i> আদায়</a></li>
+    <% if (role !== 'viewer') { %>
+    <li><a class="nav-link" href="/collections/new"><i class="bi bi-plus-circle"></i> নতুন আদায়</a></li>
+    <% } %>
+    <li><a class="nav-link <%= active('/expenses') %>" href="/expenses"><i class="bi bi-wallet2"></i> খরচ</a></li>
+    <li><a class="nav-link <%= active('/banks') %>" href="/banks"><i class="bi bi-bank"></i> ব্যাংক</a></li>
+
+    <li class="nav-section">রিপোর্ট</li>
+    <li><a class="nav-link <%= active('/reports/collection') %>" href="/reports/collection"><i class="bi bi-file-earmark-text"></i> আদায় রিপোর্ট</a></li>
+    <li><a class="nav-link <%= active('/reports/expense') %>" href="/reports/expense"><i class="bi bi-file-earmark-minus"></i> খরচ রিপোর্ট</a></li>
+    <li><a class="nav-link <%= active('/reports/loss-profit') %>" href="/reports/loss-profit"><i class="bi bi-graph-up-arrow"></i> লাভ ও ক্ষতি</a></li>
+    <li><a class="nav-link <%= active('/reports/bank-statement') %>" href="/reports/bank-statement"><i class="bi bi-journal-text"></i> ব্যাংক স্টেটমেন্ট</a></li>
+
+    <% if (isAdmin) { %>
+    <li class="nav-section">প্রশাসনিক সেটিংস</li>
+    <li><a class="nav-link <%= active('/books/types') %>" href="/books/types"><i class="bi bi-book"></i> বই এর ধরন</a></li>
+    <li><a class="nav-link <%= active('/books/numbers') %>" href="/books/numbers"><i class="bi bi-123"></i> বই নম্বর</a></li>
+
+    <li class="nav-section">অ্যাকাউন্ট সেটিংস</li>
+    <li><a class="nav-link <%= active('/occupations') %>" href="/occupations"><i class="bi bi-briefcase"></i> পেশা</a></li>
+    <li><a class="nav-link <%= active('/locations/division') %>" href="/locations/division"><i class="bi bi-geo-alt"></i> বিভাগ</a></li>
+    <li><a class="nav-link <%= active('/locations/district') %>" href="/locations/district"><i class="bi bi-geo"></i> জেলা</a></li>
+    <li><a class="nav-link <%= active('/locations/thana') %>" href="/locations/thana"><i class="bi bi-pin-map"></i> থানা</a></li>
+    <li><a class="nav-link <%= active('/locations/post_office') %>" href="/locations/post_office"><i class="bi bi-mailbox"></i> পোস্ট অফিস</a></li>
+    <li><a class="nav-link <%= active('/locations/village') %>" href="/locations/village"><i class="bi bi-houses"></i> গ্রাম</a></li>
+    <li><a class="nav-link <%= active('/locations/area') %>" href="/locations/area"><i class="bi bi-map"></i> এলাকা</a></li>
+
+    <li class="nav-section">সেটিংস</li>
+    <li><a class="nav-link <%= active('/settings/company') %>" href="/settings/company"><i class="bi bi-building"></i> প্রতিষ্ঠানের তথ্য</a></li>
+    <li><a class="nav-link <%= active('/users') %>" href="/users"><i class="bi bi-person-gear"></i> ব্যবহারকারী</a></li>
+    <% } %>
+  </ul>
+</nav>

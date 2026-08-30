@@ -1,0 +1,33 @@
+<h3 class="mb-3">খরচ রিপোর্ট</h3>
+<%
+  var extra = '<div class="col-md-3"><label class="form-label">খরচের খাত</label><select name="expense_head_id" class="form-select"><option value="">সব</option>';
+  heads.forEach(function(h){ extra += '<option value="'+h.id+'"'+(String(expense_head_id)===String(h.id)?' selected':'')+'>'+h.name+'</option>'; });
+  extra += '</select></div>';
+%>
+<%- include('../partials/report_filter', { from, to, extraFilter: extra }) %>
+
+<div class="card"><div class="card-body">
+  <div class="report-header text-center mb-2">
+    <h5 class="mb-0"><%= company.company_name %></h5>
+    <div class="small text-muted">খরচ রিপোর্ট<%= from? ' ('+bn.date(from)+' - '+bn.date(to||from)+')':'' %></div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-sm table-bordered datatable w-100">
+      <thead><tr><th>ক্রমিক</th><th>তারিখ</th><th>খরচের ধরন</th><th>বিবরণ</th><th>পরিমাণ</th><th>দর</th><th class="text-end">টাকা</th></tr></thead>
+      <tbody>
+        <% rows.forEach(function(e,i){ %>
+        <tr>
+          <td><%= bn.toBnDigits(i+1) %></td>
+          <td><%= bn.date(e.date) %></td>
+          <td><%= e.head_name||'' %></td>
+          <td><%= e.purpose||'' %></td>
+          <td><%= e.unit!=null?bn.toBnDigits(e.unit):'' %></td>
+          <td><%= e.rate!=null?bn.toBnDigits(e.rate):'' %></td>
+          <td class="text-end"><%= bn.money(e.amount) %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+      <tfoot><tr class="fw-bold"><td colspan="6" class="text-end">সর্বমোট</td><td class="text-end"><%= bn.money(total) %></td></tr></tfoot>
+    </table>
+  </div>
+</div></div>

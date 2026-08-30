@@ -1,0 +1,61 @@
+<h3 class="mb-3"><%= labels[level] %> ব্যবস্থাপনা</h3>
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card"><div class="card-header">নতুন <%= labels[level] %></div><div class="card-body">
+      <form method="post" action="/locations/<%= level %>">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <% if (parentCfg) { %>
+        <div class="mb-2"><label class="form-label required"><%= parentCfg.label %></label>
+          <select name="<%= parentCol %>" class="form-select select2" required>
+            <option value="">নির্বাচন করুন</option>
+            <% parents.forEach(function(p){ %><option value="<%= p.id %>"><%= p.name %></option><% }) %>
+          </select></div>
+        <% } %>
+        <div class="mb-2"><label class="form-label required"><%= labels[level] %> এর নাম</label><input type="text" name="name" class="form-control" required /></div>
+        <% if (hasPostCode) { %><div class="mb-2"><label class="form-label">পোস্ট কোড</label><input type="text" name="post_code" class="form-control" /></div><% } %>
+        <button class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i> যুক্ত করুন</button>
+      </form>
+    </div></div>
+  </div>
+  <div class="col-md-8"><div class="card"><div class="card-body"><div class="table-responsive">
+    <table class="table table-striped datatable w-100" data-buttons="false">
+      <thead><tr><th>ক্রমিক</th><% if (parentCfg) { %><th><%= parentCfg.label %></th><% } %><th>নাম</th><% if (hasPostCode) { %><th>পোস্ট কোড</th><% } %><th class="no-print">অ্যাকশন</th></tr></thead>
+      <tbody>
+        <% rows.forEach(function(r,i){
+          var fields = { name: r.name };
+          if (parentCfg) fields[parentCol] = r[parentCol];
+          if (hasPostCode) fields.post_code = r.post_code || '';
+        %>
+        <tr>
+          <td><%= bn.toBnDigits(i+1) %></td>
+          <% if (parentCfg) { %><td><%= r.parent_name||'' %></td><% } %>
+          <td><%= r.name %></td>
+          <% if (hasPostCode) { %><td><%= bn.toBnDigits(r.post_code||'') %></td><% } %>
+          <td class="no-print">
+            <button class="btn btn-sm btn-outline-primary edit-row" data-action="/locations/<%= level %>/<%= r.id %>" data-fields='<%= JSON.stringify(fields) %>'><i class="bi bi-pencil"></i></button>
+            <form method="post" action="/locations/<%= level %>/<%= r.id %>/delete" class="d-inline confirm-delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div></div></div></div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+  <form method="post" id="editForm"><input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <div class="modal-header"><h5 class="modal-title">সম্পাদনা</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <% if (parentCfg) { %>
+      <div class="mb-2"><label class="form-label"><%= parentCfg.label %></label>
+        <select name="<%= parentCol %>" class="form-select">
+          <option value="">নির্বাচন করুন</option>
+          <% parents.forEach(function(p){ %><option value="<%= p.id %>"><%= p.name %></option><% }) %>
+        </select></div>
+      <% } %>
+      <div class="mb-2"><label class="form-label">নাম</label><input type="text" name="name" class="form-control" /></div>
+      <% if (hasPostCode) { %><div class="mb-2"><label class="form-label">পোস্ট কোড</label><input type="text" name="post_code" class="form-control" /></div><% } %>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary">সংরক্ষণ</button></div>
+  </form>
+</div></div></div>
