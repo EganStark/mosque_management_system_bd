@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const expressLayouts = require('express-ejs-layouts');
 const db = require('./config/db');
 const { validateProductionEnvironment } = require('./config/environment');
+const { postgresConnection } = require('./config/postgres-connection');
 const { UPLOAD_DIR } = require('./middleware/upload');
 
 const { helmetMiddleware, csrfProtection } = require('./middleware/security');
@@ -56,7 +57,7 @@ app.use('/api', require('./routes/api'));
 app.use(
   session({
     store: new pgSession({
-      conObject: { connectionString: process.env.DATABASE_URL },
+      conObject: postgresConnection(),
       tableName: 'session',
       createTableIfMissing: true,
     }),

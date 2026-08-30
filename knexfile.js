@@ -1,6 +1,8 @@
 require('dotenv').config();
 
-const connection = process.env.DATABASE_URL || {
+const { postgresConnection } = require('./src/config/postgres-connection');
+
+const connection = postgresConnection() || {
   host: 'localhost',
   port: 5432,
   user: 'postgres',
