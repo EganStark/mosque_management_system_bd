@@ -1,4 +1,5 @@
-name: Database backup
+name: Database backup (structured credentials)
+run-name: Structured Supabase backup · ${{ github.sha }}
 
 on:
   workflow_dispatch:
@@ -13,6 +14,19 @@ jobs:
   backup:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      PGHOST: aws-0-ap-southeast-1.pooler.supabase.com
+      PGPORT: "5432"
+      PGUSER: postgres.azdqiwvsxkgftslfvqrw
+      PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      PGDATABASE: postgres
+      STORAGE_PROVIDER: supabase
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_PUBLIC_BUCKET: public-media
+      SUPABASE_PRIVATE_BUCKET: private-documents
+      SUPABASE_BACKUP_BUCKET: database-backups
+      BACKUP_RETENTION_DAYS: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,18 +34,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --omit=dev
+      - name: Validate structured database configuration
+        run: node scripts/validate-backup-environment.js
       - name: Export database to private Supabase Storage
         run: npm run backup:database
-        env:
-          PGHOST: aws-0-ap-southeast-1.pooler.supabase.com
-          PGPORT: "5432"
-          PGUSER: postgres.azdqiwvsxkgftslfvqrw
-          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-          PGDATABASE: postgres
-          STORAGE_PROVIDER: supabase
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          SUPABASE_PUBLIC_BUCKET: public-media
-          SUPABASE_PRIVATE_BUCKET: private-documents
-          SUPABASE_BACKUP_BUCKET: database-backups
-          BACKUP_RETENTION_DAYS: 30
